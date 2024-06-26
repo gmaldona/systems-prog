@@ -13,15 +13,21 @@ CFLAGS = -Wall -Wextra -Wconversion -pedantic
 
 default: lib
 
-test: hw1_test.o
-	$(CC) $(CFLAGS) -L. -o test hw1_test.o -lhw1
-
-hw1_test.o: hw1_test.c
-	$(CC) $(CFLAGS) -I. hw1_test.c
+.PHONY: test
+test: hw1_test.c
+	$(CC) $(CFLAGS) -L. hw1_test.c -lhw1 -o build/test
 
 # https://stackoverflow.com/questions/9853419
-lib: hw1_str.o
-	ar -rcs hw1.a hw1_str.o 
+lib: hw1_str.o hw1_myprintf.o
+	ar rcs libhw1.a hw1_str.o hw1_myprintf.o
+
+hw1_myprintf.o: hw1_myprintf.c
+	$(CC) $(CFLAGS) -c hw1_myprintf.c
 
 hw1_str.o: hw1_str.c
 	$(CC) $(CFLAGS) -c hw1_str.c
+
+.PHONY: clean
+clean:
+	$(RM) *.o *.a
+	$(RM) -r build

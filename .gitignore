@@ -1,6 +1,7 @@
-**/.a
-**/.o
+**/*.a
+**/*.o
 
 **/.DS_Store
 
 **/build/
+**/.vscode/

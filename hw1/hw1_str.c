@@ -35,7 +35,7 @@ int str_manip(char * str, char * substr) {
 
    char * _str = (char*) malloc(sizeof(char) * str_len + 1);
    for (size_t i = 0; i < str_len; i++) {
-      _str[i] = tolower(str[i]);
+      _str[i] = (char) tolower(str[i]);
    }
 
    // Then it prints out a new string that is a combination of str and the
@@ -57,7 +57,7 @@ int str_manip(char * str, char * substr) {
 
    char* _substr = (char *) malloc(sizeof(char) * substr_len + 1);
    for (size_t i = 0; i < substr_len; i++) {
-      _substr[i] = tolower(substr[i]);
+      _substr[i] = (char) tolower(substr[i]);
    }
    
    // Finally your function should print out the number of occurrences of substr
