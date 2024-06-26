@@ -14,7 +14,8 @@ CFLAGS = -Wall -Wextra -Wconversion -pedantic
 default: lib
 
 .PHONY: test
-test: hw1_test.c
+test: lib hw1_test.c
+	mkdir -p build
 	$(CC) $(CFLAGS) -L. hw1_test.c -lhw1 -o build/test
 
 # https://stackoverflow.com/questions/9853419

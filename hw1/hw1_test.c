@@ -10,12 +10,23 @@
  * Sciences, Binghamton University.
  */
 
+#include <assert.h>
+#include <string.h>
+
 #include "hw1.h"
 
 //==================================================================== 80 ====>>
 
+int hw1_str_test(void) {
+   str_manip("aBcAbc@defCba", "ABC");
+   return 0;
+}
+
+
 int main(void) {
-   return str_manip("greggreg", "greg");
+   assert(hw1_str_test() == 0);
+   
+   myprintf("This is a %s.\n", "test");
 }
 
 //==================================================================== 80 ====>>

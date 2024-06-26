@@ -80,10 +80,4 @@ int str_manip(char * str, char * substr) {
    return 0;
 }
 
-/*  >>>>>>>> TEST <<<<<<<< */
-// int main(void) {
-//    str_manip("aBcAbc@defCba", "ABC");
-//    return 0;
-// }
-
 //==================================================================== 80 ====>>
