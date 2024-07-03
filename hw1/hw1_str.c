@@ -11,14 +11,15 @@
  */
 
 #include <ctype.h>
-
-#include "hw1.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 //==================================================================== 80 ====>>
 int str_manip(char * str, char * substr) {
    // Your function should be able to handle erroneous input arguments.
    if (str == NULL || substr == NULL) {
-      printf("[ERROR] The string or substring is NULL. Both need to be non-null");
+      printf("[ERROR] The (sub)?string is NULL. Both need to be non-null.");
       return -1;
    }
    
@@ -75,6 +76,9 @@ int str_manip(char * str, char * substr) {
    }
    printf("occurences %zu\n", matches);
 
+   free(_str);
+   free(_substr);
+   free(newStr);
    // Your function should return 0 upon success, and -1 if the operations fail
    // (in this case, the error message should be output to the screen).
    return 0;

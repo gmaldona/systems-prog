@@ -9,7 +9,7 @@
 # Sciences, Binghamton University.
 
 CC     = gcc
-CFLAGS = -Wall -Wextra -Wconversion -pedantic
+CFLAGS = # -Wall -Wextra -Wconversion -pedantic
 
 default: lib
 

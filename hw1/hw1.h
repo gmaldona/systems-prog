@@ -13,15 +13,18 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <curses.h>
 
-// #define printf(format, ...) myprintf(format, __VA_ARGS__)
-// #define  MYMSG(format, ...) do {\
-//    char* metadata = " --> ";\
-//    char* _format  = malloc(sizeof(char) * (strlen(format)  + \
-//                                                 strlen(metadata) + 1);\
-                                
-//    printf(_format, __VA_ARGS__); \
-//                                  } while (0)
+#define printf(format, ...) myprintf(format, __VA_ARGS__)
+#define MYMSG(format, ...) do {\
+   char* _format = (char *) malloc((sizeof(char) * strlen(format)) +\
+                                   (sizeof(char) * strlen(__FILE__)) +\
+   /* 37 characters vvvv */        37);/*4 is the extra characters in between*/\
+   sprintf(_format, "Original message --> %s:%d: %s",\
+                                          __FILE__, __LINE__, format);\
+   printf(_format, __VA_ARGS__);\
+   free(_format);\
+} while (0)
 
 //==================================================================== 80 ====>>
 

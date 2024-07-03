@@ -26,7 +26,8 @@ int hw1_str_test(void) {
 int main(void) {
    assert(hw1_str_test() == 0);
    
-   myprintf("This is a %s.\n", "test");
+   
+   MYMSG("CS%c%d\n", '-', 551);
 }
 
 //==================================================================== 80 ====>>

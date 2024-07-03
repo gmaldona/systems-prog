@@ -11,8 +11,9 @@
  */
 
 #include <stdarg.h>
-
-#include "hw1.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 //==================================================================== 80 ====>>
 
