@@ -56,11 +56,4 @@ void myprintf(const char * format, ...) {
    va_end(argv);
 }
 
-/*  >>>>>>>> TEST <<<<<<<< */
-
-// int main(void) {
-//    myprintf("This is CS%c%d%s", '-', 551, " Systems Programming.\n");
-//    return 0;
-// }
-
 //==================================================================== 80 ====>>
