@@ -16,11 +16,11 @@ default: lib
 .PHONY: test
 test: lib hw1_test.c
 	mkdir -p build
-	$(CC) $(CFLAGS) -L. hw1_test.c -lhw1 -o build/test
+	$(CC) $(CFLAGS) -L. hw1_test.c hw1.a -o build/test
 
 # https://stackoverflow.com/questions/9853419
 lib: hw1_str.o hw1_myprintf.o
-	ar rcs libhw1.a hw1_str.o hw1_myprintf.o
+	ar rcs hw1.a hw1_str.o hw1_myprintf.o
 
 hw1_myprintf.o: hw1_myprintf.c
 	$(CC) $(CFLAGS) -c hw1_myprintf.c

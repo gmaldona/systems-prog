@@ -1,7 +1,11 @@
 **/*.a
 **/*.o
+**/*.pdf
 
 **/.DS_Store
 
 **/build/
 **/.vscode/
+
+**/submissions/
+**/*.zip
