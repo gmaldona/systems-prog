@@ -8,7 +8,7 @@ Authored By: Gregory Maldonado
  * [HW 1 - Learning C for the millionth time but painfully slow edition](./hw1)
 
 ## Coding Assignments
- * [Project 1 - KISS C memory allocator]()
+ * [Project 1 - BYO Memory Allocator](./gmalloc)
 
 ---
 
