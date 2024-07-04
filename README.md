@@ -4,8 +4,11 @@ Authored By: Gregory Maldonado
 
 <b>Thomas J. Watson College of Engineering and Applied Sciences, Binghamton University</b>
 
-## Assigments
+## Homework
  * [HW 1 - Learning C for the millionth time but painfully slow edition](./hw1)
+
+## Coding Assignments
+ * [Project 1 - KISS C memory allocator]()
 
 ---
 
