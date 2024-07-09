@@ -10,28 +10,10 @@
  * Graduate student @ Thomas J. Watson College of Engineering and Applied
  * Sciences, Binghamton University.
  */
-#include <stdint.h>
-#include <math.h>
 
 #include "common.h"
 
 //==================================================================== 80 ====>>
-
-// https://stackoverflow.com/questions/72903837
-void hex_bitmap(unsigned char hex, u_int8_t* dest)
-{
-    for (int i = 0; i < BIT_PER_BYTE; ++i) {
-        dest[i] = (hex >> i) & 1;
-    }
-}
-
-unsigned char bitmap_hex(u_int8_t* src) {
-    unsigned char hex = 0;
-    for (int i = 0; i < BIT_PER_BYTE; ++i) {
-        hex = (hex << 1) | src[i];
-    }
-    return hex;
-}
 
 /*
  * Find the position (starting from 0) of the first bit that has value "val" in 
@@ -50,22 +32,7 @@ unsigned char bitmap_hex(u_int8_t* src) {
  */
 int bitmap_find_first_bit(unsigned char * bitmap, int size, int val)
 {
-    if (1 < val || val < 0 || size < 0) {
-        return BITMAP_OP_ERROR;
-    }
-
-	u_int8_t dest[BIT_PER_BYTE];
-    for (int i = 0; i < size; ++i) {
-        hex_bitmap(bitmap[i], dest);
-
-        for (size_t j = 0; j < BIT_PER_BYTE; ++j) {
-            if (dest[j] == (u_int8_t) val) {
-                return j; 
-            }
-        }
-    }
-
-    return BITMAP_OP_NOT_FOUND;
+	/* Your code here */
 }
 
 /*
@@ -80,23 +47,7 @@ int bitmap_find_first_bit(unsigned char * bitmap, int size, int val)
  */
 int bitmap_set_bit(unsigned char * bitmap, int size, int target_pos)
 {
-    if (target_pos >= size * BIT_PER_BYTE || target_pos < 0) {
-        return BITMAP_OP_ERROR;
-    }
-
-    size_t index = (size_t) floor(target_pos / BIT_PER_BYTE);
-    uint8_t dest[BIT_PER_BYTE];
-
-    hex_bitmap(bitmap[index], dest);
-
-    for (size_t i = 0; i < BIT_PER_BYTE; ++i) {    
-        if (index + i == target_pos) {
-            dest[i] = 1;
-            bitmap[index] = bitmap_hex(dest);
-        }
-    }
-
-    return BITMAP_OP_ERROR;
+    /* Your code here */
 }
 
 /*
@@ -111,7 +62,7 @@ int bitmap_set_bit(unsigned char * bitmap, int size, int target_pos)
  */
 int bitmap_clear_bit(unsigned char * bitmap, int size, int target_pos)
 {
-    return 0;
+    /* Your code here */
 }
 
 
@@ -125,7 +76,7 @@ int bitmap_clear_bit(unsigned char * bitmap, int size, int target_pos)
  */
 int bitmap_bit_is_set(unsigned char * bitmap, int size, int pos)
 {
-    return 0;
+    /* Your code here */
 }
 
 /*

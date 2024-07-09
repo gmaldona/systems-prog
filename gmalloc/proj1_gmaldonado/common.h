@@ -23,12 +23,9 @@
 
 #define BIT_PER_BYTE 8
 
-#define BITMAP_OP_SUCCEED    0
+#define BITMAP_OP_SUCCEED   0
 #define BITMAP_OP_NOT_FOUND -1
 #define BITMAP_OP_ERROR     -2
-
-void hex_bitmap(unsigned char c, u_int8_t* dest);
-unsigned char bitmap_hex(u_int8_t* src);
 
 int bitmap_find_first_bit(unsigned char * bitmap, int size, int val);
 int bitmap_set_bit(unsigned char * bitmap, int size, int target_pos);

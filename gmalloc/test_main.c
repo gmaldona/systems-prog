@@ -19,14 +19,33 @@
 int main(int argc, char * argv[])
 {
 	// Your code
+    unsigned char bitmap[] = {0xF7, 0xFF};
+    
+    int val = bitmap_find_first_bit(bitmap, sizeof(bitmap), 0);
+    printf("%d\n", val);
 
-    mem_mngr_init();
+    for (size_t i = 0; i < sizeof(bitmap); ++i) {
+        printf("%x\t", bitmap[i]);
+    }
+
+    printf("\n");
+
+    bitmap_set_bit(bitmap, sizeof(bitmap), 3);
+    for (size_t i = 0; i < sizeof(bitmap); ++i) {
+        printf("%x\t", bitmap[i]);
+    }
+
+    printf("\n");
+    
+    // bitmap_find_first_bit(bitmap, sizeof(bitmap), 0);
+
+    // mem_mngr_init();
 
 
 	// test your code here.
 
 
-    mem_mngr_leave();
+    // mem_mngr_leave();
 
     return 0;
 }

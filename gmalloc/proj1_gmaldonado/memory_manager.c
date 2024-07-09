@@ -74,7 +74,6 @@ void mem_mngr_leave(void)
 void * mem_mngr_alloc(size_t size)
 {
 	/* You code here */
-    return NULL;
 }
 
 /*
