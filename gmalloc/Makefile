@@ -26,7 +26,7 @@ memory_manager.o: memory_manager.c
 
 .PHONY: zip
 zip:
-	zip proj1_gmaldonado.zip bitmap.c common.h interposition.h memory_manager.*
+	zip proj1_gmaldonado.zip bitmap.c common.h interposition.h memory_manager.* README.txt
 
 .PHONY: clean
 clean:

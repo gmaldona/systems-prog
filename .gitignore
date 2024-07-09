@@ -9,3 +9,6 @@
 
 **/submissions/
 **/*.zip
+
+# one for grading, one for github.
+**/readme.txt

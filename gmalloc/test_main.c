@@ -16,9 +16,8 @@
 
 //==================================================================== 80 ====>>
 
-int main(int argc, char * argv[])
-{
-	// Your code
+void test_bitmap(void) {
+
     unsigned char bitmap[] = {0xF7, 0xFF};
     
     int val = bitmap_find_first_bit(bitmap, sizeof(bitmap), 0);
@@ -27,8 +26,9 @@ int main(int argc, char * argv[])
     for (size_t i = 0; i < sizeof(bitmap); ++i) {
         printf("%x\t", bitmap[i]);
     }
-
+    
     printf("\n");
+    printf("bitmap@3 is %d\n", bitmap_bit_is_set(bitmap, sizeof(bitmap), 3));
 
     bitmap_set_bit(bitmap, sizeof(bitmap), 3);
     for (size_t i = 0; i < sizeof(bitmap); ++i) {
@@ -36,15 +36,34 @@ int main(int argc, char * argv[])
     }
 
     printf("\n");
-    
-    // bitmap_find_first_bit(bitmap, sizeof(bitmap), 0);
+    printf("bitmap@3 is %d\n", bitmap_bit_is_set(bitmap, sizeof(bitmap), 3));
+
+    u_int8_t dest[BIT_PER_BYTE]; 
+    bitmap_clear_bit(bitmap, sizeof(bitmap), 3);
+    for (size_t i = 0; i < sizeof(bitmap); ++i) {
+        printf("%x\t", bitmap[i]);
+        hex_bitmap(bitmap[i], dest);
+        for (size_t j = 0; j < sizeof(dest); j++) {
+            printf("%d", dest[j]);
+        }
+        printf("\n");
+    }
+
+    printf("\n");
+    printf("bitmap@3 is %d\n", bitmap_bit_is_set(bitmap, sizeof(bitmap), 3));
+
+}
+
+int main(int argc, char * argv[])
+{
+	// Your code
 
     // mem_mngr_init();
 
 
 	// test your code here.
 
-
+    test_bitmap();
     // mem_mngr_leave();
 
     return 0;

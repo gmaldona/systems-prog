@@ -27,6 +27,7 @@ void hex_bitmap(unsigned char hex, u_int8_t* dest)
 
 unsigned char bitmap_hex(u_int8_t* src) {
     unsigned char hex = 0;
+
     for (int i = 0; i < BIT_PER_BYTE; ++i) {
         hex = (hex << 1) | src[i];
     }
@@ -93,6 +94,7 @@ int bitmap_set_bit(unsigned char * bitmap, int size, int target_pos)
         if (index + i == target_pos) {
             dest[i] = 1;
             bitmap[index] = bitmap_hex(dest);
+            return BITMAP_OP_SUCCEED;
         }
     }
 
@@ -111,7 +113,27 @@ int bitmap_set_bit(unsigned char * bitmap, int size, int target_pos)
  */
 int bitmap_clear_bit(unsigned char * bitmap, int size, int target_pos)
 {
-    return 0;
+    if (target_pos >= size * BIT_PER_BYTE || target_pos < 0) {
+        return BITMAP_OP_ERROR;
+    }
+
+    size_t index = (size_t) floor(target_pos / BIT_PER_BYTE);
+    uint8_t dest[BIT_PER_BYTE];
+
+    hex_bitmap(bitmap[index], dest);
+
+    for (size_t i = 0; i < BIT_PER_BYTE; ++i) {    
+        printf("%d", dest[i]);
+        if (index + i == target_pos) {
+            dest[i] = 0;
+            bitmap[index] = bitmap_hex(dest);
+            printf("\n");
+            return BITMAP_OP_SUCCEED;
+        }
+    }
+    printf("\n");
+
+    return BITMAP_OP_ERROR;
 }
 
 
@@ -125,7 +147,22 @@ int bitmap_clear_bit(unsigned char * bitmap, int size, int target_pos)
  */
 int bitmap_bit_is_set(unsigned char * bitmap, int size, int pos)
 {
-    return 0;
+    if (pos >= size * BIT_PER_BYTE || pos < 0) {
+        return BITMAP_OP_ERROR;
+    }
+
+    size_t index = (size_t) floor(pos / BIT_PER_BYTE);
+    uint8_t dest[BIT_PER_BYTE];
+
+    hex_bitmap(bitmap[index], dest);
+
+    for (size_t i = 0; i < BIT_PER_BYTE; ++i) {    
+        if (index + i == pos) {
+            return dest[i];
+        }
+    }
+
+    return BITMAP_OP_ERROR;
 }
 
 /*
