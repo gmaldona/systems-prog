@@ -159,34 +159,43 @@ mem_mngr_alloc(size_t size) {
  */
 void
 mem_mngr_free(void *ptr) {
-  // TODO: check for double free.
-
-
-  STRU_MEM_LIST *list = mem_pool->next_list;
+  STRU_MEM_LIST *list = mem_pool;
+  size_t _BATCH_INDEX = 0;
   while (list) {
 	STRU_MEM_BATCH *_batch_0 = list->first_batch;
 	STRU_MEM_BATCH *_batch_1 = _batch_0->next_batch;
-
+	// if _batch_1 is NULL then batch_0 will still be operated on.
 	while (_batch_0 && _batch_1) {
 	  if ((STRU_MEM_BATCH *)ptr >= _batch_0 || (STRU_MEM_BATCH *)ptr < _batch_1) {
 		break;
 	  } else {
 		_batch_0 = _batch_0->next_batch;
 		_batch_1 = _batch_1->next_batch;
+		++_BATCH_INDEX;
 	  }
 	}
 
 	void *batch_mem = _batch_0->batch_mem;
-	for (int i = 0; i < MEM_BATCH_SLOT_COUNT * MEM_BATCH_SLOT_COUNT; ++i) {
-	  int alignment = i * MEM_ALIGNMENT_BOUNDARY;
-	  if (ptr == (batch_mem + alignment)) {
-		bitmap_set_bit(list->free_slots_bitmap, sizeof(list->free_slots_bitmap), i);
-		free(ptr);
+	for (int i = 0; i < MEM_BATCH_SLOT_COUNT; ++i) {
+	  if (ptr == (batch_mem + (i * MEM_ALIGNMENT_BOUNDARY))) {
+		// free(ptr); NOT FREEING, you still have the memory in the manager
+		if (bitmap_bit_is_set(list->free_slots_bitmap,
+							  list->batch_count,
+							  (_BATCH_INDEX * MEM_ALIGNMENT_BOUNDARY) + i) == 1) {
+		  printf("[ERROR] double free on pointer\t%p\n", ptr);
+		} else {
+		  bitmap_set_bit(list->free_slots_bitmap,
+						 list->batch_count,
+						 (_BATCH_INDEX * MEM_ALIGNMENT_BOUNDARY) + i);
+		}
+		return;
 	  }
 	}
 
 	list = list->next_list;
   }
+
+  printf("[WARNING] Pointer given is not being managed.\n");
 }
 
 //==================================================================== 80 ====>>

@@ -76,21 +76,24 @@ main(int argc, char *argv[]) {
 //  test_bitmap();
 
   mem_mngr_init();
-//  for (int i = 0; i < 8; ++i) {
-//	printf("Allocation (%d)\t%p\n", i, mem_mngr_alloc(7));
-//  }
-//
-//  for (int i = 0; i < 8; ++i) {
-//	printf("Allocation (%d)\t%p\n", i, mem_mngr_alloc(7));
-//  }
 
   void *p1 = mem_mngr_alloc(7);
   mem_mngr_free(p1);
   void *p2 = mem_mngr_alloc(7);
+  void *p3 = mem_mngr_alloc(7);
+  void *p4 = mem_mngr_alloc(7);
+  void *p5 = mem_mngr_alloc(7);
+  mem_mngr_free(p2);
+  void *p6 = mem_mngr_alloc(7);
 
   printf("%p\n", p1);
   printf("%p\n", p2);
-  
+  printf("%p\n", p3);
+  printf("%p\n", p4);
+  printf("%p\n", p5);
+  printf("%p\n", p6);
+
+
   // test your code here.
 
 //    test_bitmap();
