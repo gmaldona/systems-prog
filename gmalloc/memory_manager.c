@@ -11,6 +11,7 @@
  * Sciences, Binghamton University.
  */
 
+#include <math.h>
 #include "memory_manager.h"
 
 //==================================================================== 80 ====>>
@@ -104,21 +105,45 @@ mem_mngr_alloc(size_t size) {
 
   STRU_MEM_LIST *list = mem_pool;
   while (list) { // iterate over each list... when does other lists init??
-	int slot = bitmap_find_first_bit(list->free_slots_bitmap,
-									 MEM_BATCH_SLOT_COUNT, 1);
-	if (slot < 0) {
-	  // TODO: need to expand for more slots.
+	int pos = bitmap_find_first_bit(list->free_slots_bitmap,
+									MEM_BATCH_SLOT_COUNT, 1);
+
+	if (pos < 0) {
+	  printf("[INFO] New Batch Created\n");
+	  // Get the last batch in the list - do we want to move this outside?? ^^^
+	  STRU_MEM_BATCH *batch = list->first_batch;
+	  while (list->first_batch->next_batch) {
+		batch = batch->next_batch;
+	  }
+
+	  STRU_MEM_BATCH *new_batch = (STRU_MEM_BATCH *)malloc(sizeof(STRU_MEM_BATCH));
+	  new_batch->batch_mem = malloc(MEM_ALIGNMENT_BOUNDARY * MEM_BATCH_SLOT_COUNT);
+
+	  unsigned char *new_bitmap =
+		  (unsigned char *)malloc(sizeof(list->free_slots_bitmap) + sizeof(unsigned char));
+	  memcpy(new_bitmap, list->free_slots_bitmap, sizeof(list->free_slots_bitmap));
+	  new_bitmap[sizeof(new_bitmap) - 1] = 0xFF;
+	  list->free_slots_bitmap = new_bitmap;
+	  free(new_bitmap);
+
+	  pos = bitmap_find_first_bit(list->free_slots_bitmap,
+								  MEM_BATCH_SLOT_COUNT, 1);
 	}
 
-//	printf("[DEBUG] Free slot: %d\n", slot);
 	bitmap_clear_bit(list->free_slots_bitmap,
-					 sizeof(list->free_slots_bitmap), slot);
+					 sizeof(list->free_slots_bitmap), pos);
 
-	//	STRU_MEM_BATCH *batch = mem_pool->first_batch;
+	int slot = pos % MEM_ALIGNMENT_BOUNDARY;
+	int i = 0;
+	int target_batch = (int)floor(slot / MEM_ALIGNMENT_BOUNDARY);
 
-	return NULL;
+	STRU_MEM_BATCH *batch = list->first_batch;
+	while (i < target_batch) {
+	  batch = batch->next_batch;
+	  i++;
+	}
+	return (batch->batch_mem + (slot * MEM_ALIGNMENT_BOUNDARY));
 
-	list = list->next_list;
   }
   return NULL;
 }

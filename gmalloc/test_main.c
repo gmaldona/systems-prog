@@ -76,11 +76,12 @@ main(int argc, char *argv[]) {
 //  test_bitmap();
 
   mem_mngr_init();
-  mem_mngr_alloc(7);
-  mem_mngr_alloc(7);
+  for (int i = 0; i < 8; ++i) {
+	printf("%p\n", mem_mngr_alloc(7));
+  }
 
-  mem_mngr_alloc(7);
-  mem_mngr_alloc(7);
+  printf("%p\n", mem_mngr_alloc(7));
+  printf("%p\n", mem_mngr_alloc(7));
 
   // test your code here.
 
