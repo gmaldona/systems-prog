@@ -83,6 +83,28 @@ test_allocator() {
 
   printf("Passed in unaligned pointer to free: \n");
   mem_mngr_free(p6 + 1);
+
+  void *p7 = mem_mngr_alloc(7);
+  void *p8 = mem_mngr_alloc(7);
+
+  void *p9 = mem_mngr_alloc(7);
+  void *p10 = mem_mngr_alloc(7);
+  void *p11 = mem_mngr_alloc(7);
+
+  printf("pointer 1\t%p\n", p1);
+  printf("pointer 2\t%p\n", p2);
+  printf("pointer 3\t%p\n", p3);
+  printf("pointer 4\t%p\n", p4);
+  printf("pointer 5\t%p\n", p5);
+  printf("pointer 6\t%p\n", p6);
+  printf("pointer 7\t%p\n", p7);
+  printf("pointer 8\t%p\n", p8);
+  printf("pointer 9\t%p\n", p9);
+  printf("pointer 10\t%p\n", p10);
+  printf("pointer 11\t%p\n", p11);
+
+  printf("Expecting two batches\n");
+  mem_mngr_print_snapshot();
 }
 
 int
@@ -97,10 +119,6 @@ main(int argc, char *argv[]) {
 
   test_allocator();
 
-
-  // test your code here.
-
-//    test_bitmap();
   mem_mngr_leave();
 
   return 0;
