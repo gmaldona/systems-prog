@@ -6,6 +6,7 @@
 
 **/build/
 **/.vscode/
+**/.idea/
 
 **/submissions/
 **/*.zip
