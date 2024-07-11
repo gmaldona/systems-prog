@@ -16,57 +16,78 @@
 
 //==================================================================== 80 ====>>
 
-void test_bitmap(void) {
+void
+test_bitmap(void) {
+  printf("\n\n================ TESTS ================\n");
+  unsigned char bitmap[] = {0xF7, 0xFF};
+//
+//  for (size_t i = 0; i < sizeof(bitmap); ++i) {
+//	printf("%x\t", bitmap[i]);
+//  }
 
-    unsigned char bitmap[] = {0xF7, 0xFF};
-    
-    int val = bitmap_find_first_bit(bitmap, sizeof(bitmap), 0);
-    printf("%d\n", val);
+//  printf("\n================ FIND FIRST BIT TEST ================\n");
+//  int val = bitmap_find_first_bit(bitmap, sizeof(bitmap), 0);
+//  printf("%d\n", val);
+//
+//  for (size_t i = 0; i < sizeof(bitmap); ++i) {
+//	printf("%x\t", bitmap[i]);
+//  }
 
-    for (size_t i = 0; i < sizeof(bitmap); ++i) {
-        printf("%x\t", bitmap[i]);
-    }
-    
-    printf("\n");
-    printf("bitmap@3 is %d\n", bitmap_bit_is_set(bitmap, sizeof(bitmap), 3));
+  printf("\n\n================ SET BIT TEST ================\n");
+  u_int8_t dest[BIT_PER_BYTE];
+  bitmap_set_bit(bitmap, sizeof(bitmap), 3);
 
-    bitmap_set_bit(bitmap, sizeof(bitmap), 3);
-    for (size_t i = 0; i < sizeof(bitmap); ++i) {
-        printf("%x\t", bitmap[i]);
-    }
+  for (size_t i = 0; i < sizeof(bitmap); ++i) {
+	printf("%x\t", bitmap[i]);
+	for (size_t j = 0; j < sizeof(dest); j++) {
+	  if (j % 4 == 0) {
+		printf("  ");
+	  }
+	  printf("%d", dest[j]);
+	}
+	printf("\n");
+  }
 
-    printf("\n");
-    printf("bitmap@3 is %d\n", bitmap_bit_is_set(bitmap, sizeof(bitmap), 3));
+//  printf("\n\n================ CLEAR BIT TEST ================\n");
+//  bitmap_clear_bit(bitmap, sizeof(bitmap), 3);
+//  for (size_t i = 0; i < sizeof(bitmap); ++i) {
+//	printf("%x\t", bitmap[i]);
+//	hex_bitmap(bitmap[i], dest);
+//	for (size_t j = 0; j < sizeof(dest); j++) {
+//	  if (j % 4 == 0) {
+//		printf("  ");
+//	  }
+//	  printf("%d", dest[j]);
+//	}
+//	printf("\n");
+//  }
 
-    u_int8_t dest[BIT_PER_BYTE]; 
-    bitmap_clear_bit(bitmap, sizeof(bitmap), 3);
-    for (size_t i = 0; i < sizeof(bitmap); ++i) {
-        printf("%x\t", bitmap[i]);
-        hex_bitmap(bitmap[i], dest);
-        for (size_t j = 0; j < sizeof(dest); j++) {
-            printf("%d", dest[j]);
-        }
-        printf("\n");
-    }
-
-    printf("\n");
-    printf("bitmap@3 is %d\n", bitmap_bit_is_set(bitmap, sizeof(bitmap), 3));
+  // printf("\n");
+  // printf("bitmap@3 is %d\n", bitmap_bit_is_set(bitmap, sizeof(bitmap), 3));
 
 }
 
-int main(int argc, char * argv[])
-{
-	// Your code
+int
+main(int argc, char *argv[]) {
+  // Your code
 
-    // mem_mngr_init();
+//  unsigned char f[] = {0xF7, 0xFF, 0x01};
+//  bitmap_print_bitmap(f, sizeof(f));
+//  test_bitmap();
 
+  mem_mngr_init();
+  mem_mngr_alloc(7);
+  mem_mngr_alloc(7);
 
-	// test your code here.
+  mem_mngr_alloc(7);
+  mem_mngr_alloc(7);
 
-    test_bitmap();
-    // mem_mngr_leave();
+  // test your code here.
 
-    return 0;
+//    test_bitmap();
+  // mem_mngr_leave();
+
+  return 0;
 }
 
 //==================================================================== 80 ====>>

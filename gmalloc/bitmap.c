@@ -18,20 +18,19 @@
 //==================================================================== 80 ====>>
 
 // https://stackoverflow.com/questions/72903837
-void hex_bitmap(unsigned char hex, u_int8_t* dest)
-{
-    for (int i = 0; i < BIT_PER_BYTE; ++i) {
-        dest[i] = (hex >> i) & 1;
-    }
+void hex_bitmap(unsigned char hex, u_int8_t *dest) {
+  for (int i = 0; i < BIT_PER_BYTE; ++i) {
+	dest[i] = (hex >> i) & 1;
+  }
 }
 
-unsigned char bitmap_hex(u_int8_t* src) {
-    unsigned char hex = 0;
+unsigned char bitmap_hex(u_int8_t *src) {
+  unsigned char hex = 0;
 
-    for (int i = 0; i < BIT_PER_BYTE; ++i) {
-        hex = (hex << 1) | src[i];
-    }
-    return hex;
+  for (int i = 7; i >= 0; --i) {
+	hex = (hex << 1) | src[i];
+  }
+  return hex;
 }
 
 /*
@@ -49,24 +48,23 @@ unsigned char bitmap_hex(u_int8_t* src) {
  * 
  *          BITMAP_OP_ERROR (defined in "common.h") on any other errors
  */
-int bitmap_find_first_bit(unsigned char * bitmap, int size, int val)
-{
-    if (1 < val || val < 0 || size < 0) {
-        return BITMAP_OP_ERROR;
-    }
+int bitmap_find_first_bit(unsigned char *bitmap, int size, int val) {
+  if (1 < val || val < 0 || size < 0) {
+	return BITMAP_OP_ERROR;
+  }
 
-	u_int8_t dest[BIT_PER_BYTE];
-    for (int i = 0; i < size; ++i) {
-        hex_bitmap(bitmap[i], dest);
+  u_int8_t dest[BIT_PER_BYTE];
+  for (int i = 0; i < size; ++i) {
+	hex_bitmap(bitmap[i], dest);
 
-        for (size_t j = 0; j < BIT_PER_BYTE; ++j) {
-            if (dest[j] == (u_int8_t) val) {
-                return j; 
-            }
-        }
-    }
+	for (size_t j = 0; j < BIT_PER_BYTE; ++j) {
+	  if (dest[j] == (u_int8_t)val) {
+		return j;
+	  }
+	}
+  }
 
-    return BITMAP_OP_NOT_FOUND;
+  return BITMAP_OP_NOT_FOUND;
 }
 
 /*
@@ -79,26 +77,25 @@ int bitmap_find_first_bit(unsigned char * bitmap, int size, int val)
  * @return: BITMAP_OP_SUCCEED (defined in "common.h") on success
  *          BITMAP_OP_ERROR (defined in "common.h") on any errors
  */
-int bitmap_set_bit(unsigned char * bitmap, int size, int target_pos)
-{
-    if (target_pos >= size * BIT_PER_BYTE || target_pos < 0) {
-        return BITMAP_OP_ERROR;
-    }
+int bitmap_set_bit(unsigned char *bitmap, int size, int target_pos) {
+  if (target_pos >= size * BIT_PER_BYTE || target_pos < 0) {
+	return BITMAP_OP_ERROR;
+  }
 
-    size_t index = (size_t) floor(target_pos / BIT_PER_BYTE);
-    uint8_t dest[BIT_PER_BYTE];
+  size_t index = (size_t)floor(target_pos / BIT_PER_BYTE);
+  uint8_t dest[BIT_PER_BYTE];
 
-    hex_bitmap(bitmap[index], dest);
+  hex_bitmap(bitmap[index], dest);
 
-    for (size_t i = 0; i < BIT_PER_BYTE; ++i) {    
-        if (index + i == target_pos) {
-            dest[i] = 1;
-            bitmap[index] = bitmap_hex(dest);
-            return BITMAP_OP_SUCCEED;
-        }
-    }
+  for (size_t i = 0; i < BIT_PER_BYTE; ++i) {
+	if (index + i == target_pos) {
+	  dest[i] = 1;
+	  bitmap[index] = bitmap_hex(dest);
+	  return BITMAP_OP_SUCCEED;
+	}
+  }
 
-    return BITMAP_OP_ERROR;
+  return BITMAP_OP_ERROR;
 }
 
 /*
@@ -111,31 +108,28 @@ int bitmap_set_bit(unsigned char * bitmap, int size, int target_pos)
  * @return: BITMAP_OP_SUCCEED (defined in "common.h") on success
  *          BITMAP_OP_ERROR (defined in "common.h") on any errors
  */
-int bitmap_clear_bit(unsigned char * bitmap, int size, int target_pos)
-{
-    if (target_pos >= size * BIT_PER_BYTE || target_pos < 0) {
-        return BITMAP_OP_ERROR;
-    }
+int bitmap_clear_bit(unsigned char *bitmap, int size, int target_pos) {
+  if (target_pos >= size * BIT_PER_BYTE || target_pos < 0) {
+	return BITMAP_OP_ERROR;
+  }
 
-    size_t index = (size_t) floor(target_pos / BIT_PER_BYTE);
-    uint8_t dest[BIT_PER_BYTE];
+  size_t index = (size_t)floor(target_pos / BIT_PER_BYTE);
+  uint8_t dest[BIT_PER_BYTE];
 
-    hex_bitmap(bitmap[index], dest);
+  hex_bitmap(bitmap[index], dest);
+  
+  for (size_t i = 0; i < BIT_PER_BYTE; ++i) {
+	if ((index * BIT_PER_BYTE) + i == target_pos) {
 
-    for (size_t i = 0; i < BIT_PER_BYTE; ++i) {    
-        printf("%d", dest[i]);
-        if (index + i == target_pos) {
-            dest[i] = 0;
-            bitmap[index] = bitmap_hex(dest);
-            printf("\n");
-            return BITMAP_OP_SUCCEED;
-        }
-    }
-    printf("\n");
+	  dest[i] = 0;
+	  *(bitmap + index) = bitmap_hex(dest);
 
-    return BITMAP_OP_ERROR;
+	  return BITMAP_OP_SUCCEED;
+	}
+  }
+
+  return BITMAP_OP_ERROR;
 }
-
 
 /*
  * Test if the value of the "pos"-th bit (starting from 0) in the "bitmap" is 1.
@@ -145,24 +139,23 @@ int bitmap_clear_bit(unsigned char * bitmap, int size, int target_pos)
  * @return: the value of the bit of interest (i.e., 0 or 1) on success
  *          BITMAP_OP_ERROR (defined in "common.h") on any errors
  */
-int bitmap_bit_is_set(unsigned char * bitmap, int size, int pos)
-{
-    if (pos >= size * BIT_PER_BYTE || pos < 0) {
-        return BITMAP_OP_ERROR;
-    }
+int bitmap_bit_is_set(unsigned char *bitmap, int size, int pos) {
+  if (pos >= size * BIT_PER_BYTE || pos < 0) {
+	return BITMAP_OP_ERROR;
+  }
 
-    size_t index = (size_t) floor(pos / BIT_PER_BYTE);
-    uint8_t dest[BIT_PER_BYTE];
+  size_t index = (size_t)floor(pos / BIT_PER_BYTE);
+  uint8_t dest[BIT_PER_BYTE];
 
-    hex_bitmap(bitmap[index], dest);
+  hex_bitmap(bitmap[index], dest);
 
-    for (size_t i = 0; i < BIT_PER_BYTE; ++i) {    
-        if (index + i == pos) {
-            return dest[i];
-        }
-    }
+  for (size_t i = 0; i < BIT_PER_BYTE; ++i) {
+	if (index + i == pos) {
+	  return dest[i];
+	}
+  }
 
-    return BITMAP_OP_ERROR;
+  return BITMAP_OP_ERROR;
 }
 
 /*
@@ -175,38 +168,34 @@ int bitmap_bit_is_set(unsigned char * bitmap, int size, int pos)
  *          BITMAP_OP_ERROR (defined in "common.h") on any errors
  * Do not change the implementation of this function.
  */
-int bitmap_print_bitmap(unsigned char * bitmap, int size)
-{
-    int pos = 0;
-    int total_bits = size * BIT_PER_BYTE;
-    unsigned char current_byte = 0;
+int bitmap_print_bitmap(unsigned char *bitmap, int size) {
+  int pos = 0;
+  int total_bits = size * BIT_PER_BYTE;
+  unsigned char current_byte = 0;
 
-    if (NULL == bitmap)
-    {
-        printf("ERROR: NULL bit map!\n");
-        return BITMAP_OP_ERROR;
-    }
+  if (NULL == bitmap) {
+	printf("ERROR: NULL bit map!\n");
+	return BITMAP_OP_ERROR;
+  }
 
-    printf("bitmap %p size %d bytes: ", bitmap, size);
+  printf("bitmap %p size %d bytes: ", bitmap, size);
 
-    while (pos < total_bits)
-    {
-        int v = 0;
-        
-        current_byte = *(bitmap + pos/BIT_PER_BYTE);
-        v = ((current_byte >> pos % BIT_PER_BYTE) & 0x01);
-        printf("%d", v);
-        if ((pos + 1) % 4 == 0)
-        {
-            printf("  ");
-        }
-        
-        pos++;
-    }
+  while (pos < total_bits) {
+	int v = 0;
 
-    printf("\n");
+	current_byte = *(bitmap + pos / BIT_PER_BYTE);
+	v = ((current_byte >> pos % BIT_PER_BYTE) & 0x01);
+	printf("%d", v);
+	if ((pos + 1) % 4 == 0) {
+	  printf("  ");
+	}
 
-    return BITMAP_OP_SUCCEED;
+	pos++;
+  }
+
+  printf("\n");
+
+  return BITMAP_OP_SUCCEED;
 }
 
 //==================================================================== 80 ====>>
