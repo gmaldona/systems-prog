@@ -79,18 +79,18 @@ mem_mngr_init(void) {
  */
 void
 mem_mngr_leave(void) {
-  /* Your code here */
-}
+  STRU_MEM_LIST *list = mem_pool;
+  while (list) {
 
-/**
- * Aux function for batch expansion in a list.
- * Takes the last filled batch and returns a new batch of managed memory with
- * a link between the prev_batch and the new_batch.
- * @param prev_batch
- */
-STRU_MEM_BATCH *
-mem_mngr_batch_expansion(STRU_MEM_BATCH *prev_batch) {
-  return NULL;
+	STRU_MEM_BATCH *batch = list->first_batch;
+	while (batch) {
+	  free(batch->batch_mem);
+	  batch = batch->next_batch;
+	}
+
+	free(list->free_slots_bitmap);
+	list = list->next_list;
+  }
 }
 
 /*
@@ -100,8 +100,6 @@ mem_mngr_batch_expansion(STRU_MEM_BATCH *prev_batch) {
  */
 void *
 mem_mngr_alloc(size_t size) {
-
-  printf("[DEBUG] Memory allocated: %zu\n", size);
 
   STRU_MEM_LIST *list = mem_pool;
   while (list) { // iterate over each list... when does other lists init??
@@ -119,12 +117,18 @@ mem_mngr_alloc(size_t size) {
 	  STRU_MEM_BATCH *new_batch = (STRU_MEM_BATCH *)malloc(sizeof(STRU_MEM_BATCH));
 	  new_batch->batch_mem = malloc(MEM_ALIGNMENT_BOUNDARY * MEM_BATCH_SLOT_COUNT);
 
+	  bitmap_print_bitmap(list->free_slots_bitmap, sizeof(list->free_slots_bitmap));
+
 	  unsigned char *new_bitmap =
-		  (unsigned char *)malloc(sizeof(list->free_slots_bitmap) + sizeof(unsigned char));
-	  memcpy(new_bitmap, list->free_slots_bitmap, sizeof(list->free_slots_bitmap));
-	  new_bitmap[sizeof(new_bitmap) - 1] = 0xFF;
+		  (unsigned char *)realloc(list->free_slots_bitmap,
+								   sizeof(list->free_slots_bitmap) + sizeof(unsigned char));
+//	  memcpy(new_bitmap, list->free_slots_bitmap, list->batch_count);
+	  new_bitmap[list->batch_count] = 0xFF;
 	  list->free_slots_bitmap = new_bitmap;
+	  list->batch_count++;
 	  free(new_bitmap);
+
+	  bitmap_print_bitmap(list->free_slots_bitmap, sizeof(list->free_slots_bitmap));
 
 	  pos = bitmap_find_first_bit(list->free_slots_bitmap,
 								  MEM_BATCH_SLOT_COUNT, 1);
@@ -155,15 +159,34 @@ mem_mngr_alloc(size_t size) {
  */
 void
 mem_mngr_free(void *ptr) {
-//	STRU_MEM_LIST * list = mem_pool;
-//	while (list) {
-//		STRU_MEM_BATCH* batch = list->first_batch;
-//
-//		while (batch) {
-//			batch = batch->next_batch;
-//		}
-//		list = list->next_list;
-//	}
+  // TODO: check for double free.
+
+
+  STRU_MEM_LIST *list = mem_pool->next_list;
+  while (list) {
+	STRU_MEM_BATCH *_batch_0 = list->first_batch;
+	STRU_MEM_BATCH *_batch_1 = _batch_0->next_batch;
+
+	while (_batch_0 && _batch_1) {
+	  if ((STRU_MEM_BATCH *)ptr >= _batch_0 || (STRU_MEM_BATCH *)ptr < _batch_1) {
+		break;
+	  } else {
+		_batch_0 = _batch_0->next_batch;
+		_batch_1 = _batch_1->next_batch;
+	  }
+	}
+
+	void *batch_mem = _batch_0->batch_mem;
+	for (int i = 0; i < MEM_BATCH_SLOT_COUNT * MEM_BATCH_SLOT_COUNT; ++i) {
+	  int alignment = i * MEM_ALIGNMENT_BOUNDARY;
+	  if (ptr == (batch_mem + alignment)) {
+		bitmap_set_bit(list->free_slots_bitmap, sizeof(list->free_slots_bitmap), i);
+		free(ptr);
+	  }
+	}
+
+	list = list->next_list;
+  }
 }
 
 //==================================================================== 80 ====>>
