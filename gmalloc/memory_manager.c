@@ -183,11 +183,15 @@ mem_mngr_free(void *ptr) {
 							  list->batch_count,
 							  (_BATCH_INDEX * MEM_ALIGNMENT_BOUNDARY) + i) == 1) {
 		  printf("[ERROR] double free on pointer\t%p\n", ptr);
-		} else {
-		  bitmap_set_bit(list->free_slots_bitmap,
-						 list->batch_count,
-						 (_BATCH_INDEX * MEM_ALIGNMENT_BOUNDARY) + i);
+		  return;
 		}
+		bitmap_set_bit(list->free_slots_bitmap,
+					   list->batch_count,
+					   (_BATCH_INDEX * MEM_ALIGNMENT_BOUNDARY) + i);
+		return;
+	  } else if (ptr > (batch_mem + (i * MEM_ALIGNMENT_BOUNDARY)) &&
+		  ptr <= (batch_mem + (i * MEM_ALIGNMENT_BOUNDARY) + 7)) {
+		printf("[ERROR] unaligned starting memory of pointer\t%p\n", ptr);
 		return;
 	  }
 	}

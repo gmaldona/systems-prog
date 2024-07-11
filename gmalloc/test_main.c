@@ -80,6 +80,9 @@ test_allocator() {
 
   printf("%p == %p\n", p1, p6);
   printf("%p != %p\n", p3, p4);
+
+  printf("Passed in unaligned pointer to free: \n");
+  mem_mngr_free(p6 + 1);
 }
 
 int
