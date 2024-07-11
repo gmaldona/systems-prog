@@ -20,18 +20,18 @@ void
 test_bitmap(void) {
   printf("\n\n================ TESTS ================\n");
   unsigned char bitmap[] = {0xF7, 0xFF};
-//
-//  for (size_t i = 0; i < sizeof(bitmap); ++i) {
-//	printf("%x\t", bitmap[i]);
-//  }
 
-//  printf("\n================ FIND FIRST BIT TEST ================\n");
-//  int val = bitmap_find_first_bit(bitmap, sizeof(bitmap), 0);
-//  printf("%d\n", val);
-//
-//  for (size_t i = 0; i < sizeof(bitmap); ++i) {
-//	printf("%x\t", bitmap[i]);
-//  }
+  for (size_t i = 0; i < sizeof(bitmap); ++i) {
+	printf("%x\t", bitmap[i]);
+  }
+
+  printf("\n================ FIND FIRST BIT TEST ================\n");
+  int val = bitmap_find_first_bit(bitmap, sizeof(bitmap), 0);
+  printf("%d\n", val);
+
+  for (size_t i = 0; i < sizeof(bitmap); ++i) {
+	printf("%x\t", bitmap[i]);
+  }
 
   printf("\n\n================ SET BIT TEST ================\n");
   u_int8_t dest[BIT_PER_BYTE];
@@ -48,23 +48,38 @@ test_bitmap(void) {
 	printf("\n");
   }
 
-//  printf("\n\n================ CLEAR BIT TEST ================\n");
-//  bitmap_clear_bit(bitmap, sizeof(bitmap), 3);
-//  for (size_t i = 0; i < sizeof(bitmap); ++i) {
-//	printf("%x\t", bitmap[i]);
-//	hex_bitmap(bitmap[i], dest);
-//	for (size_t j = 0; j < sizeof(dest); j++) {
-//	  if (j % 4 == 0) {
-//		printf("  ");
-//	  }
-//	  printf("%d", dest[j]);
-//	}
-//	printf("\n");
-//  }
+  printf("\n\n================ CLEAR BIT TEST ================\n");
+  bitmap_clear_bit(bitmap, sizeof(bitmap), 3);
+  for (size_t i = 0; i < sizeof(bitmap); ++i) {
+	printf("%x\t", bitmap[i]);
+	hex_bitmap(bitmap[i], dest);
+	for (size_t j = 0; j < sizeof(dest); j++) {
+	  if (j % 4 == 0) {
+		printf("  ");
+	  }
+	  printf("%d", dest[j]);
+	}
+	printf("\n");
+  }
 
-  // printf("\n");
-  // printf("bitmap@3 is %d\n", bitmap_bit_is_set(bitmap, sizeof(bitmap), 3));
+  printf("\n");
+  printf("bitmap@3 is %d\n", bitmap_bit_is_set(bitmap, sizeof(bitmap), 3));
 
+}
+
+void
+test_allocator() {
+  void *p1 = mem_mngr_alloc(7);
+  mem_mngr_free(p1);
+  void *p2 = mem_mngr_alloc(7);
+  void *p3 = mem_mngr_alloc(7);
+  void *p4 = mem_mngr_alloc(7);
+  void *p5 = mem_mngr_alloc(7);
+  mem_mngr_free(p2);
+  void *p6 = mem_mngr_alloc(7);
+
+  printf("%p == %p\n", p1, p6);
+  printf("%p != %p\n", p3, p4);
 }
 
 int
@@ -77,21 +92,7 @@ main(int argc, char *argv[]) {
 
   mem_mngr_init();
 
-  void *p1 = mem_mngr_alloc(7);
-  mem_mngr_free(p1);
-  void *p2 = mem_mngr_alloc(7);
-  void *p3 = mem_mngr_alloc(7);
-  void *p4 = mem_mngr_alloc(7);
-  void *p5 = mem_mngr_alloc(7);
-  mem_mngr_free(p2);
-  void *p6 = mem_mngr_alloc(7);
-
-  printf("%p\n", p1);
-  printf("%p\n", p2);
-  printf("%p\n", p3);
-  printf("%p\n", p4);
-  printf("%p\n", p5);
-  printf("%p\n", p6);
+  test_allocator();
 
 
   // test your code here.
