@@ -119,10 +119,10 @@ mem_mngr_alloc(size_t size) {
 
 	  bitmap_print_bitmap(list->free_slots_bitmap, sizeof(list->free_slots_bitmap));
 
-	  unsigned char *new_bitmap =
-		  (unsigned char *)realloc(list->free_slots_bitmap,
-								   sizeof(list->free_slots_bitmap) + sizeof(unsigned char));
-	  // memcpy(new_bitmap, list->free_slots_bitmap, list->batch_count);
+	  unsigned char *new_bitmap = malloc((list->batch_count + 1) * sizeof(unsigned char));
+	  memcpy(new_bitmap, list->free_slots_bitmap, list->batch_count);
+	  free(list->free_slots_bitmap);
+
 	  new_bitmap[list->batch_count] = 0xFF;
 	  list->free_slots_bitmap = new_bitmap;
 	  list->batch_count++;
