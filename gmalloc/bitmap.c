@@ -59,7 +59,7 @@ int bitmap_find_first_bit(unsigned char *bitmap, int size, int val) {
 
 	for (size_t j = 0; j < BIT_PER_BYTE; ++j) {
 	  if (dest[j] == (u_int8_t)val) {
-		return j;
+		return (i * BIT_PER_BYTE) + j;
 	  }
 	}
   }
