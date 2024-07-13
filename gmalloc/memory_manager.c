@@ -117,18 +117,16 @@ mem_mngr_alloc(size_t size) {
 	  STRU_MEM_BATCH *new_batch = (STRU_MEM_BATCH *)malloc(sizeof(STRU_MEM_BATCH));
 	  new_batch->batch_mem = malloc(MEM_ALIGNMENT_BOUNDARY * MEM_BATCH_SLOT_COUNT);
 
-	  bitmap_print_bitmap(list->free_slots_bitmap, sizeof(list->free_slots_bitmap));
-
 	  unsigned char *new_bitmap = malloc((list->batch_count + 1) * sizeof(unsigned char));
-	  memcpy(new_bitmap, list->free_slots_bitmap, list->batch_count);
+
+	  memcpy(new_bitmap, list->free_slots_bitmap, sizeof(list->free_slots_bitmap));
 	  free(list->free_slots_bitmap);
 
-	  new_bitmap[list->batch_count] = 0xFF;
 	  list->free_slots_bitmap = new_bitmap;
-	  list->batch_count++;
-	  free(new_bitmap);
+	  list->free_slots_bitmap[list->batch_count] = 0xFF;
 
 	  bitmap_print_bitmap(list->free_slots_bitmap, sizeof(list->free_slots_bitmap));
+	  list->batch_count++;
 
 	  pos = bitmap_find_first_bit(list->free_slots_bitmap,
 								  MEM_BATCH_SLOT_COUNT, 1);
