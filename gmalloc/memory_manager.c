@@ -118,7 +118,7 @@ mem_mngr_alloc(size_t size) {
                                     UCHAR_PER_CHUNK * list->batch_count, 1);
 
     if (pos < 0) {
-      printf("[INFO] New Batch Created\n");
+      printf("[INFO] New Batch Created: ");
       // Get the last batch in the list - do we want to move this outside?? ^^^
       STRU_MEM_BATCH *batch = list->first_batch;
       while (batch->next_batch) {
@@ -126,7 +126,9 @@ mem_mngr_alloc(size_t size) {
       }
 
       STRU_MEM_BATCH *new_batch = (STRU_MEM_BATCH *) malloc(sizeof(STRU_MEM_BATCH));
+      printf("%p\n", new_batch);
       new_batch->batch_mem = malloc(MEM_ALIGNMENT_BOUNDARY * MEM_BATCH_SLOT_COUNT);
+      printf("[INFO] Batch Memory: %p\n", new_batch->batch_mem);
 
       batch->next_batch = new_batch;
       unsigned char *new_bitmap =
@@ -157,14 +159,14 @@ mem_mngr_alloc(size_t size) {
 
     int slot = pos % CHUNK_SIZE;
     int i = 0;
-    int target_batch = (int) floor(pos / CHUNK_SIZE);
+    int target_batch = (int) floor(pos / MEM_BATCH_SLOT_COUNT);
 
     STRU_MEM_BATCH *batch = list->first_batch;
     while (i < target_batch) {
       batch = batch->next_batch;
       i++;
     }
-    return (batch->batch_mem + (slot * MEM_ALIGNMENT_BOUNDARY));
+    return (batch->batch_mem + (slot % MEM_ALIGNMENT_BOUNDARY) * MEM_ALIGNMENT_BOUNDARY);
 
   }
   return NULL;
