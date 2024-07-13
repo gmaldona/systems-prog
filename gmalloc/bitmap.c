@@ -87,10 +87,12 @@ int bitmap_set_bit(unsigned char *bitmap, int size, int target_pos) {
   size_t index = (size_t)floor(target_pos / BIT_PER_BYTE);
   uint8_t dest[BIT_PER_BYTE];
 
+  hex_bitmap(bitmap[index], dest);
+
   for (size_t i = 0; i < BIT_PER_BYTE; ++i) {
-	if (index + i == target_pos) {
+	if ((index * BIT_PER_BYTE) + i == target_pos) {
 	  dest[i] = 1;
-	  bitmap[index] = bitmap_hex(dest);
+	  *(bitmap + index) = bitmap_hex(dest);
 	  return BITMAP_OP_SUCCEED;
 	}
   }

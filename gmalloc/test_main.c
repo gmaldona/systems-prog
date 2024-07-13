@@ -108,14 +108,28 @@ test_allocator() {
 }
 
 void allot_alloc() {
-  for (int i = 0; i < 10; ++i) {  // batches
+  for (int i = 0; i < 1; ++i) {  // batches
     printf("Batch %d:\n", i);
-    for (int j = 0; j < 8; ++j) {// slots
+    for (int j = 0; j < MEM_BATCH_SLOT_COUNT; ++j) {// slots
       void* p = mem_mngr_alloc(7);
       printf("%p\n", p);
     }
     printf("\n");
   }
+  mem_mngr_print_snapshot();
+}
+
+void variable_dealloc() {
+  for (int i = 0; i < 1; ++i) {  // batches
+    for (int j = 0; j < MEM_BATCH_SLOT_COUNT -1; ++j) {// slots
+      mem_mngr_alloc(7);
+    }
+  }
+  void* p1 = mem_mngr_alloc(7);
+  mem_mngr_free(p1);
+  void* p2 = mem_mngr_alloc(7);
+  printf("%p == %p\n", p1, p2);
+
   mem_mngr_print_snapshot();
 }
 
@@ -129,7 +143,8 @@ main(int argc, char *argv[]) {
 //  double_free_test();
 //  realloc_mem_test();
 //  test_allocator();
-    allot_alloc();
+//    allot_alloc();
+  variable_dealloc();
   mem_mngr_leave();
 
   return 0;

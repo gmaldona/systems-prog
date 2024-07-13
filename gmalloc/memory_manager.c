@@ -62,8 +62,10 @@ mem_mngr_init(void) {
   mem_pool->next_list = NULL;
 
   mem_pool->free_slots_bitmap =
-      (unsigned char *) malloc(sizeof(unsigned char));
-  *(mem_pool->free_slots_bitmap) = 0xFF; // init first slot bitmap to all 1s.
+      (unsigned char *) malloc(UCHAR_PER_CHUNK * sizeof(unsigned char));
+  for (int i = 0 ; i < UCHAR_PER_CHUNK; ++i) {
+    *(mem_pool->free_slots_bitmap + i) = 0xFF; // init first slot bitmap to all 1s.
+  }
 
   mem_pool->first_batch =
       (STRU_MEM_BATCH *) malloc(sizeof(STRU_MEM_BATCH));
@@ -111,8 +113,10 @@ mem_mngr_alloc(size_t size) {
 
   STRU_MEM_LIST *list = mem_pool;
   while (list) { // iterate over each list... when does other lists init??
+
     int pos = bitmap_find_first_bit(list->free_slots_bitmap,
-                                    list->batch_count, 1);
+                                    UCHAR_PER_CHUNK * list->batch_count, 1);
+
     if (pos < 0) {
       printf("[INFO] New Batch Created\n");
       // Get the last batch in the list - do we want to move this outside?? ^^^
@@ -127,7 +131,7 @@ mem_mngr_alloc(size_t size) {
       batch->next_batch = new_batch;
       unsigned char *new_bitmap =
           (unsigned char *) realloc(list->free_slots_bitmap,
-                                    (list->batch_count + 1) * sizeof(unsigned char));
+                                    (list->batch_count + 1) * UCHAR_PER_CHUNK * sizeof(unsigned char));
       // realloc tries to expand the current block and if fails and alloc's new
       // block of memory else where.
       if (new_bitmap == NULL) {
@@ -139,19 +143,21 @@ mem_mngr_alloc(size_t size) {
         free(temp);
       }
 
-      list->free_slots_bitmap[list->batch_count] = 0xFF;
+      for (int i = 0; i < UCHAR_PER_CHUNK; ++i) {
+        list->free_slots_bitmap[(list->batch_count * UCHAR_PER_CHUNK) + i] = 0xFF;
+      }
       list->batch_count++;
 
       pos = bitmap_find_first_bit(list->free_slots_bitmap,
-                                  list->batch_count, 1);
+                                  UCHAR_PER_CHUNK * list->batch_count, 1);
     }
 
     bitmap_clear_bit(list->free_slots_bitmap,
-                     list->batch_count, pos);
+                     UCHAR_PER_CHUNK * list->batch_count, pos);
 
-    int slot = pos % MEM_ALIGNMENT_BOUNDARY;
+    int slot = pos % CHUNK_SIZE;
     int i = 0;
-    int target_batch = (int) floor(pos / MEM_ALIGNMENT_BOUNDARY);
+    int target_batch = (int) floor(pos / CHUNK_SIZE);
 
     STRU_MEM_BATCH *batch = list->first_batch;
     while (i < target_batch) {
@@ -192,14 +198,15 @@ mem_mngr_free(void *ptr) {
       if (ptr == (batch_mem + (i * MEM_ALIGNMENT_BOUNDARY))) {
         // free(ptr); NOT FREEING, you still have the memory in the manager
         if (bitmap_bit_is_set(list->free_slots_bitmap,
-                              list->batch_count,
-                              (_BATCH_INDEX * MEM_ALIGNMENT_BOUNDARY) + i) == 1) {
+                              UCHAR_PER_CHUNK * list->batch_count,
+                              (_BATCH_INDEX * CHUNK_SIZE) + i) == 1) {
           fprintf(stderr, "[ERROR] double free on pointer\t%p\n", ptr);
           return;
         }
-        bitmap_set_bit(list->free_slots_bitmap,
-                       list->batch_count,
-                       (_BATCH_INDEX * MEM_ALIGNMENT_BOUNDARY) + i);
+          bitmap_set_bit(list->free_slots_bitmap,
+                         UCHAR_PER_CHUNK * list->batch_count,
+                         (_BATCH_INDEX * MEM_ALIGNMENT_BOUNDARY) + i);
+
         return;
       } else if (ptr > (batch_mem + (i * MEM_ALIGNMENT_BOUNDARY)) &&
           ptr <= (batch_mem + (i * MEM_ALIGNMENT_BOUNDARY) + 7)) {
