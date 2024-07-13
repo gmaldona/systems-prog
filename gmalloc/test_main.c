@@ -116,13 +116,13 @@ void allot_alloc() {
     }
     printf("\n");
   }
-  printf("Total pointers allocated: %d\n", 3 * MEM_BATCH_SLOT_COUNT);
+//  printf("Total pointers allocated: %d\n", 3 * MEM_BATCH_SLOT_COUNT);
   mem_mngr_print_snapshot();
 }
 
 void variable_dealloc() {
   for (int i = 0; i < 1; ++i) {  // batches
-    for (int j = 0; j < MEM_BATCH_SLOT_COUNT -1; ++j) {// slots
+    for (int j = 0; j < MEM_BATCH_SLOT_COUNT -1; ++j) { // slots
       mem_mngr_alloc(7);
     }
   }

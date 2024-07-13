@@ -19,7 +19,7 @@
 #include "common.h"
 
 /* Data allocation alignment. */
-#define MEM_ALIGNMENT_BOUNDARY  8
+#define MEM_ALIGNMENT_BOUNDARY  16
 
 /* The number of memory slots in a memory batch. */
 #define MEM_BATCH_SLOT_COUNT    8

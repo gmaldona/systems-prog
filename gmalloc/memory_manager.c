@@ -157,17 +157,17 @@ mem_mngr_alloc(size_t size) {
     bitmap_clear_bit(list->free_slots_bitmap,
                      UCHAR_PER_CHUNK * list->batch_count, pos);
 
-    int slot = pos % CHUNK_SIZE;
-    int i = 0;
+    int slot = pos % MEM_BATCH_SLOT_COUNT;
     int target_batch = (int) floor(pos / MEM_BATCH_SLOT_COUNT);
 
     STRU_MEM_BATCH *batch = list->first_batch;
+    int i = 0;
     while (i < target_batch) {
       batch = batch->next_batch;
       i++;
     }
-    return (batch->batch_mem + (slot % MEM_ALIGNMENT_BOUNDARY) * MEM_ALIGNMENT_BOUNDARY);
-
+//    return batch->batch_mem + (slot - (MEM_ALIGNMENT_BOUNDARY * (int)floor(slot / MEM_ALIGNMENT_BOUNDARY))) * MEM_ALIGNMENT_BOUNDARY;
+    return batch->batch_mem + (slot * MEM_ALIGNMENT_BOUNDARY);
   }
   return NULL;
 }
