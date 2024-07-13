@@ -85,11 +85,19 @@ mem_mngr_leave(void) {
     STRU_MEM_BATCH *batch = list->first_batch;
     while (batch) {
       free(batch->batch_mem);
+
+      STRU_MEM_BATCH* curr_batch = batch;
       batch = batch->next_batch;
+
+      free(curr_batch);
     }
 
     free(list->free_slots_bitmap);
+
+    STRU_MEM_LIST* curr_list = list;
     list = list->next_list;
+
+    free(curr_list);
   }
 }
 
@@ -110,27 +118,35 @@ mem_mngr_alloc(size_t size) {
       printf("[INFO] New Batch Created\n");
       // Get the last batch in the list - do we want to move this outside?? ^^^
       STRU_MEM_BATCH *batch = list->first_batch;
-      while (list->first_batch->next_batch) {
+      while (batch->next_batch) {
         batch = batch->next_batch;
       }
 
       STRU_MEM_BATCH *new_batch = (STRU_MEM_BATCH *) malloc(sizeof(STRU_MEM_BATCH));
       new_batch->batch_mem = malloc(MEM_ALIGNMENT_BOUNDARY * MEM_BATCH_SLOT_COUNT);
 
+      batch->next_batch = new_batch;
       unsigned char *new_bitmap =
           (unsigned char *) realloc(list->free_slots_bitmap,
                                     sizeof(list->free_slots_bitmap) + sizeof(unsigned char));
       // realloc tries to expand the current block and if fails and alloc's new
       // block of memory else where.
+      if (new_bitmap == NULL) {
+        printf("[ERROR] Unable to allocate more batch memory.");
+      }
       if (list->free_slots_bitmap != new_bitmap) {
+
+        printf("%p\n", list->free_slots_bitmap);
+        printf("%p\n", new_bitmap);
+
         unsigned char *temp = list->free_slots_bitmap;
         list->free_slots_bitmap = new_bitmap;
+
         free(temp);
       }
+
       list->free_slots_bitmap[list->batch_count] = 0xFF;
       list->batch_count++;
-
-      bitmap_print_bitmap(list->free_slots_bitmap, sizeof(list->free_slots_bitmap));
 
       pos = bitmap_find_first_bit(list->free_slots_bitmap,
                                   MEM_BATCH_SLOT_COUNT, 1);
@@ -140,8 +156,9 @@ mem_mngr_alloc(size_t size) {
                      sizeof(list->free_slots_bitmap), pos);
 
     int slot = pos % MEM_ALIGNMENT_BOUNDARY;
+    printf("SLOT: %d\n", slot);
     int i = 0;
-    int target_batch = (int) floor(slot / MEM_ALIGNMENT_BOUNDARY);
+    int target_batch = (int) floor(pos / MEM_ALIGNMENT_BOUNDARY);
 
     STRU_MEM_BATCH *batch = list->first_batch;
     while (i < target_batch) {
