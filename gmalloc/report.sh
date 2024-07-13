@@ -16,7 +16,7 @@ if [ -d build ]; then
            --show-leak-kinds=all \
            --track-origins=yes \
            --verbose \
-           --log-file=valgrind-out.txt \
+           --log-file=build/valgrind-out.txt \
            "$git_root"/gmalloc/build/test_main
 
 #

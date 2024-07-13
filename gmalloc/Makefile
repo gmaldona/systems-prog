@@ -14,9 +14,13 @@ CLAGS = # -Wall -Wextra -Wconversion -pedantic
 default: lib
 
 .PHONY: main
-main: bitmap.o memory_manager.o
+main: lib test_main.c
 	mkdir -p build
-	$(CC) $(CFLAGS) -o build/test_main test_main.c bitmap.c memory_manager.c
+	$(CC) -L. test_main.c memory_manager.a -o build/test_main
+
+.PHONY: lib
+lib: bitmap.o memory_manager.o
+	ar rcs memory_manager.a bitmap.o memory_manager.o
 
 bitmap.o: bitmap.c
 	$(CC) $(CFLAGS) -c bitmap.c
@@ -26,7 +30,7 @@ memory_manager.o: memory_manager.c
 
 .PHONY: zip
 zip:
-	zip proj1_gmaldonado.zip bitmap.c common.h interposition.h memory_manager.* README.txt
+	zip proj1_gmaldonado.zip bitmap.c common.h interposition.h memory_manager.* Makefile README.md
 
 .PHONY: clean
 clean:
