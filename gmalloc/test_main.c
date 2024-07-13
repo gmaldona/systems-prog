@@ -70,6 +70,8 @@ test_allocator() {
   void *p3 = mem_mngr_alloc(7);
   void *p4 = mem_mngr_alloc(7);
   void *p5 = mem_mngr_alloc(7);
+
+//  mem_mngr_free(p2);
   void *p6 = mem_mngr_alloc(7);
 
   // // printf("%p == %p\n", p1, p6);

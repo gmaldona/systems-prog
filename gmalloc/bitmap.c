@@ -57,11 +57,14 @@ int bitmap_find_first_bit(unsigned char *bitmap, int size, int val) {
   for (int i = 0; i < size; ++i) {
 	hex_bitmap(bitmap[i], dest);
 
+	// for (int i = 7; i >= 0; --i) {
 	for (size_t j = 0; j < BIT_PER_BYTE; ++j) {
+	  printf("i=%d\tbit=%d\t", i, dest[j]);
 	  if (dest[j] == (u_int8_t)val) {
 		return (i * BIT_PER_BYTE) + j;
 	  }
 	}
+	printf("\n");
   }
 
   return BITMAP_OP_NOT_FOUND;
