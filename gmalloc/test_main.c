@@ -108,7 +108,7 @@ test_allocator() {
 }
 
 void allot_alloc() {
-  for (int i = 0; i < 1; ++i) {  // batches
+  for (int i = 0; i < 3; ++i) {  // batches
     printf("Batch %d:\n", i);
     for (int j = 0; j < MEM_BATCH_SLOT_COUNT; ++j) {// slots
       void* p = mem_mngr_alloc(7);
@@ -116,6 +116,7 @@ void allot_alloc() {
     }
     printf("\n");
   }
+  printf("Total pointers allocated: %d\n", 3 * MEM_BATCH_SLOT_COUNT);
   mem_mngr_print_snapshot();
 }
 
@@ -143,8 +144,8 @@ main(int argc, char *argv[]) {
 //  double_free_test();
 //  realloc_mem_test();
 //  test_allocator();
-//    allot_alloc();
-  variable_dealloc();
+    allot_alloc();
+//  variable_dealloc();
   mem_mngr_leave();
 
   return 0;

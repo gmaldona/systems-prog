@@ -19,10 +19,10 @@
 #include "common.h"
 
 /* Data allocation alignment. */
-#define MEM_ALIGNMENT_BOUNDARY  16
+#define MEM_ALIGNMENT_BOUNDARY  8
 
 /* The number of memory slots in a memory batch. */
-#define MEM_BATCH_SLOT_COUNT    16
+#define MEM_BATCH_SLOT_COUNT    8
 
 #define UCHAR_PER_CHUNK (MEM_BATCH_SLOT_COUNT / BIT_PER_BYTE)
 #define CHUNK_SIZE (MEM_BATCH_SLOT_COUNT * MEM_ALIGNMENT_BOUNDARY)
