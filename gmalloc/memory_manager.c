@@ -112,8 +112,7 @@ mem_mngr_alloc(size_t size) {
   STRU_MEM_LIST *list = mem_pool;
   while (list) { // iterate over each list... when does other lists init??
     int pos = bitmap_find_first_bit(list->free_slots_bitmap,
-                                    MEM_BATCH_SLOT_COUNT, 1);
-
+                                    list->batch_count, 1);
     if (pos < 0) {
       printf("[INFO] New Batch Created\n");
       // Get the last batch in the list - do we want to move this outside?? ^^^
@@ -128,20 +127,15 @@ mem_mngr_alloc(size_t size) {
       batch->next_batch = new_batch;
       unsigned char *new_bitmap =
           (unsigned char *) realloc(list->free_slots_bitmap,
-                                    sizeof(list->free_slots_bitmap) + sizeof(unsigned char));
+                                    (list->batch_count + 1) * sizeof(unsigned char));
       // realloc tries to expand the current block and if fails and alloc's new
       // block of memory else where.
       if (new_bitmap == NULL) {
         printf("[ERROR] Unable to allocate more batch memory.");
       }
       if (list->free_slots_bitmap != new_bitmap) {
-
-        printf("%p\n", list->free_slots_bitmap);
-        printf("%p\n", new_bitmap);
-
         unsigned char *temp = list->free_slots_bitmap;
         list->free_slots_bitmap = new_bitmap;
-
         free(temp);
       }
 
@@ -149,14 +143,13 @@ mem_mngr_alloc(size_t size) {
       list->batch_count++;
 
       pos = bitmap_find_first_bit(list->free_slots_bitmap,
-                                  MEM_BATCH_SLOT_COUNT, 1);
+                                  list->batch_count, 1);
     }
 
     bitmap_clear_bit(list->free_slots_bitmap,
-                     sizeof(list->free_slots_bitmap), pos);
+                     list->batch_count, pos);
 
     int slot = pos % MEM_ALIGNMENT_BOUNDARY;
-    printf("SLOT: %d\n", slot);
     int i = 0;
     int target_batch = (int) floor(pos / MEM_ALIGNMENT_BOUNDARY);
 

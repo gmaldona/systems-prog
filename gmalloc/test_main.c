@@ -107,6 +107,18 @@ test_allocator() {
    mem_mngr_print_snapshot();
 }
 
+void allot_alloc() {
+  for (int i = 0; i < 10; ++i) {  // batches
+    printf("Batch %d:\n", i);
+    for (int j = 0; j < 8; ++j) {// slots
+      void* p = mem_mngr_alloc(7);
+      printf("%p\n", p);
+    }
+    printf("\n");
+  }
+  mem_mngr_print_snapshot();
+}
+
 int
 main(int argc, char *argv[]) {
   // Your code
@@ -117,7 +129,7 @@ main(int argc, char *argv[]) {
 //  double_free_test();
 //  realloc_mem_test();
 //  test_allocator();
-
+    allot_alloc();
   mem_mngr_leave();
 
   return 0;
