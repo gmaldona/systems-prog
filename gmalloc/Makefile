@@ -30,7 +30,8 @@ memory_manager.o: memory_manager.c
 
 .PHONY: zip
 zip:
-	zip proj1_gmaldonado.zip bitmap.c common.h interposition.h memory_manager.* Makefile README.md
+	mkdir -p build
+	zip build/proj1_gmaldonado.zip bitmap.c common.h interposition.h memory_manager.* Makefile README.md
 
 .PHONY: clean
 clean:
