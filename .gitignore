@@ -2,12 +2,15 @@
 **/*.o
 **/*.pdf
 
+**/*.swp
+
 **/.DS_Store
 
 **/build/
 **/.vscode/
 **/.idea/
 **/cmake-build-debug
+**/CMakeLists.txt
 
 **/submissions/
 **/*.zip
