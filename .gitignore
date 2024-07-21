@@ -7,6 +7,7 @@
 **/build/
 **/.vscode/
 **/.idea/
+**/cmake-build-debug
 
 **/submissions/
 **/*.zip
