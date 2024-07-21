@@ -57,16 +57,18 @@ int switch_column(char *path, int col_x, int col_y) {
    }
 
    char *src;
-   if ((src = (char *)mmap(NULL, 10,
-                           PROT_READ, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+   if ((src = (char *)mmap(NULL, fd_stat.st_size, PROT_READ | PROT_WRITE,
+                           MAP_SHARED, fd, 0)) == MAP_FAILED) {
       fprintf(stderr, "Failed to map file bytes into memory");
       return -1;
    }
 
-   printf("%s\n\n", src);
+   char *dup = (char *)malloc(fd_stat.st_size * sizeof(char));
+   strncpy(dup, src, fd_stat.st_size);
 
    size_t file_pos = 0;
    size_t col_pos = 0;
+   size_t row_st_pos = 0;
 
    char col_x_buff[64];
    char col_y_buff[64];
@@ -74,44 +76,44 @@ int switch_column(char *path, int col_x, int col_y) {
    int col_x_pos = 0;
    int col_y_pos = 0;
 
-   while (file_pos < 11) {
+   while (file_pos <= fd_stat.st_size) {
 
-      if (src[file_pos] == EOL) {
+      if (src[file_pos] == EOL || file_pos == fd_stat.st_size) {
 
          if (col_x_pos > 0 && col_y_pos > 0) {
             // TODO: MAJOR ASSUMPTION that all cols are equals.
-//            int col_sz = strlen(col_x_buff);
+            size_t col_sz = strlen(col_x_buff);
 
-//            off_t offset_x = (off_t)(((col_pos - col_x_pos) * col_sz)
-//               + ((col_pos - col_x_pos) - 1));
-//
-//            off_t offset_y = (off_t)(((col_pos - col_y_pos) * col_sz)
-//               + ((col_pos - col_y_pos) - 1));
+            size_t offset_x = row_st_pos + (col_x * col_sz) + col_x;
 
-            //memcpy(src + offset_x, col_y_buff, strlen(col_y_buff));
-            //memcpy(src + offset_y, col_x_buff, strlen(col_x_buff));
+            size_t offset_y = row_st_pos + (col_y * col_sz) + col_y;
+
+            memcpy(dup + offset_x, col_y_buff, strlen(col_y_buff));
+            memcpy(dup + offset_y, col_x_buff, strlen(col_x_buff));
          }
 
          col_pos = 0;
          col_x_pos = 0;
          col_y_pos = 0;
+         row_st_pos = file_pos + 1;
+
       } else if (src[file_pos] == DELIM) {
          ++col_pos;
-      }
-
-      if (col_pos == col_x) {
-//         strncpy(col_x_buff + col_x_pos, src + file_pos, sizeof(char));
-         ++col_x_pos;
-      }
-      if (col_pos == col_y) {
-//         strncpy(col_y_buff + col_y_pos, src + file_pos, sizeof(char));
-         ++col_y_pos;
+      } else {
+         if (col_pos == col_x) {
+            strncpy(col_x_buff + col_x_pos, src + file_pos, sizeof(char));
+            ++col_x_pos;
+         }
+         if (col_pos == col_y) {
+            strncpy(col_y_buff + col_y_pos, src + file_pos, sizeof(char));
+            ++col_y_pos;
+         }
       }
 
       ++file_pos;
    }
 
-   printf("%s\n", src);
+   printf("%s\n", dup);
 
    if (munmap(src, fd_stat.st_size) < 0) {
       fprintf(stderr, "Failed to unmap memory");
