@@ -63,9 +63,6 @@ int switch_column(char *path, int col_x, int col_y) {
       return -1;
    }
 
-   char *dup = (char *)malloc(fd_stat.st_size * sizeof(char));
-   strncpy(dup, src, fd_stat.st_size);
-
    size_t file_pos = 0;
    size_t col_pos = 0;
    size_t row_st_pos = 0;
@@ -88,8 +85,8 @@ int switch_column(char *path, int col_x, int col_y) {
 
             size_t offset_y = row_st_pos + (col_y * col_sz) + col_y;
 
-            memcpy(dup + offset_x, col_y_buff, strlen(col_y_buff));
-            memcpy(dup + offset_y, col_x_buff, strlen(col_x_buff));
+            memcpy(src + offset_x, col_y_buff, strlen(col_y_buff));
+            memcpy(src + offset_y, col_x_buff, strlen(col_x_buff));
          }
 
          col_pos = 0;
@@ -113,8 +110,7 @@ int switch_column(char *path, int col_x, int col_y) {
       ++file_pos;
    }
 
-   printf("%s\n", dup);
-
+   msync(src, fd_stat.st_size, MS_SYNC);
    if (munmap(src, fd_stat.st_size) < 0) {
       fprintf(stderr, "Failed to unmap memory");
       return -1;
