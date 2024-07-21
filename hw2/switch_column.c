@@ -80,9 +80,7 @@ int switch_column(char *path, int col_x, int col_y) {
          if (col_x_pos > 0 && col_y_pos > 0) {
             // TODO: MAJOR ASSUMPTION that all cols are equals.
             size_t col_sz = strlen(col_x_buff);
-
             size_t offset_x = row_st_pos + (col_x * col_sz) + col_x;
-
             size_t offset_y = row_st_pos + (col_y * col_sz) + col_y;
 
             memcpy(src + offset_x, col_y_buff, strlen(col_y_buff));
@@ -135,7 +133,7 @@ int main(int args, char **argv) {
    int col_x = atoi(argv[2]);
    int col_y = atoi(argv[3]);
 
-   return switch_column(path, col_x, col_y);
+   return (-1) * switch_column(path, col_x - 1, col_y - 1);
 }
 
 //==================================================================== 80 ====>>
