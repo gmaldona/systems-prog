@@ -3,7 +3,7 @@
  *
  * author: Gregory Maldonado
  * email : gmaldonado@cs.binghamton.edu
- * date  : 2024-07-04
+ * date  : 2024-07-20
  * web   : https://cs.binghamton.edu/~gmaldonado/
  *
  * Graduate student @ Thomas J. Watson College of Engineering and Applied
@@ -17,6 +17,9 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <string.h>
+
+#define EOL   0x0a
+#define DELIM 0x20
 
 //==================================================================== 80 ====>>
 
@@ -54,11 +57,61 @@ int switch_column(char *path, int col_x, int col_y) {
    }
 
    char *src;
-   if ((src = (char *)mmap(NULL, fd_stat.st_size,
-                           O_RDWR, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+   if ((src = (char *)mmap(NULL, 10,
+                           PROT_READ, MAP_SHARED, fd, 0)) == MAP_FAILED) {
       fprintf(stderr, "Failed to map file bytes into memory");
       return -1;
    }
+
+   printf("%s\n\n", src);
+
+   size_t file_pos = 0;
+   size_t col_pos = 0;
+
+   char col_x_buff[64];
+   char col_y_buff[64];
+
+   int col_x_pos = 0;
+   int col_y_pos = 0;
+
+   while (file_pos < 11) {
+
+      if (src[file_pos] == EOL) {
+
+         if (col_x_pos > 0 && col_y_pos > 0) {
+            // TODO: MAJOR ASSUMPTION that all cols are equals.
+//            int col_sz = strlen(col_x_buff);
+
+//            off_t offset_x = (off_t)(((col_pos - col_x_pos) * col_sz)
+//               + ((col_pos - col_x_pos) - 1));
+//
+//            off_t offset_y = (off_t)(((col_pos - col_y_pos) * col_sz)
+//               + ((col_pos - col_y_pos) - 1));
+
+            //memcpy(src + offset_x, col_y_buff, strlen(col_y_buff));
+            //memcpy(src + offset_y, col_x_buff, strlen(col_x_buff));
+         }
+
+         col_pos = 0;
+         col_x_pos = 0;
+         col_y_pos = 0;
+      } else if (src[file_pos] == DELIM) {
+         ++col_pos;
+      }
+
+      if (col_pos == col_x) {
+//         strncpy(col_x_buff + col_x_pos, src + file_pos, sizeof(char));
+         ++col_x_pos;
+      }
+      if (col_pos == col_y) {
+//         strncpy(col_y_buff + col_y_pos, src + file_pos, sizeof(char));
+         ++col_y_pos;
+      }
+
+      ++file_pos;
+   }
+
+   printf("%s\n", src);
 
    if (munmap(src, fd_stat.st_size) < 0) {
       fprintf(stderr, "Failed to unmap memory");
@@ -84,7 +137,7 @@ int main(int args, char **argv) {
    int col_x = atoi(argv[2]);
    int col_y = atoi(argv[3]);
 
-   switch_column(path, col_x, col_y);
+   return switch_column(path, col_x, col_y);
 }
 
 //==================================================================== 80 ====>>
