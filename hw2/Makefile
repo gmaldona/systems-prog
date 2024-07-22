@@ -16,6 +16,9 @@ default: switch_column
 switch_column: switch_column.c
 	$(CC) $(CFLAGS) switch_column.c -o switch_column
 
+oz_demo: oz_demo.c
+	$(CC) $(CFLAGS) oz_demo.c -o oz_demo
+
 .PHONY: clean
 clean:
 	$(RM) switch_column
