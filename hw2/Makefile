@@ -11,7 +11,7 @@
 CC     = gcc
 CFLAGS = # -Wall -Wextra -Wconversion -pedantic
 
-default: switch_column
+default: switch_column oz_demo
 
 switch_column: switch_column.c
 	$(CC) $(CFLAGS) switch_column.c -o switch_column
