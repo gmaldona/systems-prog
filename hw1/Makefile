@@ -28,6 +28,11 @@ hw1_myprintf.o: hw1_myprintf.c
 hw1_str.o: hw1_str.c
 	$(CC) $(CFLAGS) -c hw1_str.c
 
+.PHONY: zip
+zip:
+	mkdir -p build
+	zip build/proj1_gmaldonado.zip *.c *.h Makefile
+
 .PHONY: clean
 clean:
 	$(RM) *.o *.a

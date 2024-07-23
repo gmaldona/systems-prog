@@ -19,6 +19,11 @@ switch_column: switch_column.c
 oz_demo: oz_demo.c
 	$(CC) $(CFLAGS) oz_demo.c -o oz_demo
 
+.PHONY: zip
+zip:
+	mkdir -p build
+	zip build/proj1_gmaldonado.zip *.c Makefile
+
 .PHONY: clean
 clean:
 	$(RM) switch_column oz_demo
