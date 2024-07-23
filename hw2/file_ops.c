@@ -12,9 +12,28 @@
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include <libc.h>
+#include <unistd.h>
 
 //==================================================================== 80 ====>>
+
+/** Return number of sym-links in specified directory dir. */
+int count_sym_links(const char *d) {
+   DIR *dir = opendir(d);
+   int count = 0;
+   for (struct dirent *dP = readdir(dir); dP; dP = readdir(dir)) {
+      const char *name = dP->d_name;
+
+      struct stat *statP;
+      char dir_name[strlen(dir) + 1 + strlen(name)];
+      sprintf("%s/%s", dir, name);
+      stat(dir_name, statP);
+      if (S_ISLNK(statP->st_mode))
+         count++;
+   }
+   return count;
+}
 
 int main() {
 
