@@ -1,3 +1,3 @@
-ab ef cd gh ij
-AB EF CD GH IJ KL
-12 56 34 78
+ab cd ef gh ij
+AB CD EF GH IJ KL
+12 34 56 78
