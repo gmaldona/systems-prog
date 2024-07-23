@@ -21,4 +21,4 @@ oz_demo: oz_demo.c
 
 .PHONY: clean
 clean:
-	$(RM) switch_column
+	$(RM) switch_column oz_demo
