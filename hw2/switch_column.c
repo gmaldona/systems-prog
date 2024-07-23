@@ -79,12 +79,45 @@ int switch_column(char *path, int col_x, int col_y) {
 
          if (col_x_pos > 0 && col_y_pos > 0) {
             // TODO: MAJOR ASSUMPTION that all cols are equals.
-            size_t col_sz = strlen(col_x_buff);
-            size_t offset_x = row_st_pos + (col_x * col_sz) + col_x;
-            size_t offset_y = row_st_pos + (col_y * col_sz) + col_y;
+            // size_t col_sz = strlen(col_x_buff); <<---- WRONG TO ASSUME
+            // size_t offset_x = row_st_pos + (col_x * col_sz) + col_x;
+            // size_t offset_y = row_st_pos + (col_y * col_sz) + col_y;
 
-            memcpy(src + offset_x, col_y_buff, strlen(col_y_buff));
-            memcpy(src + offset_y, col_x_buff, strlen(col_x_buff));
+            size_t curr_pos = row_st_pos;
+            size_t offset_x = curr_pos;
+            size_t offset_y = curr_pos;
+            size_t x_size = 0;
+            size_t y_size = 0;
+            short x_set = 0;
+            short y_set = 0;
+
+            int col = 0;
+
+            while (curr_pos <= file_pos) {
+               if (col == col_x && !x_set) {
+                  offset_x = curr_pos;
+                  x_set = 1;
+                  x_size = 1;
+               } else if (x_set && col == col_x) {
+                  ++x_size;
+               }
+
+               if (col == col_y && !y_set) {
+                  offset_y = curr_pos;
+                  y_set = 1;
+                  y_size = 1;
+               } else if (y_set && col == col_y) {
+                  ++y_size;
+               }
+
+               if (src[curr_pos] == DELIM) {
+                  ++col;
+               }
+               ++curr_pos;
+            }
+
+            memcpy(src + offset_x, col_y_buff, x_size - 1);
+            memcpy(src + offset_y, col_x_buff, y_size - 1);
          }
 
          col_pos = 0;
