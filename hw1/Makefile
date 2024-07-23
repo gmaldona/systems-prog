@@ -31,7 +31,7 @@ hw1_str.o: hw1_str.c
 .PHONY: zip
 zip:
 	mkdir -p build
-	zip build/proj1_gmaldonado.zip *.c *.h Makefile
+	zip hw1_code_gmaldonado.zip *.c *.h Makefile
 
 .PHONY: clean
 clean:
