@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# author: Gregory Maldonado
+# email : gmaldonado@cs.binghamton.edu
+# date  : 2024-06-24
+# web   : https://cs.binghamton.edu/~gmaldonado/
+#
+# Graduate student @ Thomas J. Watson College of Engineering and Applied
+# Sciences, Binghamton University.
+#
+# uses: https://patorjk.com/software/taag
+
+git_root=$(git worktree list | cut -d' ' -f1)
+echo -e "$(cat "$git_root"/random/whatclassisthis.txt)"
