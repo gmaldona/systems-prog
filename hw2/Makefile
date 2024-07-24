@@ -22,7 +22,7 @@ oz_demo: oz_demo.c
 .PHONY: zip
 zip:
 	mkdir -p build
-	zip hw2_code_gmaldonado.zip *.c Makefile
+	zip hw2_code_gmaldonado.zip switch_column.c oz_demo.c Makefile
 
 .PHONY: clean
 clean:
