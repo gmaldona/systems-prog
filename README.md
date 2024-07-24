@@ -5,8 +5,8 @@ Authored By: Gregory Maldonado
 <b>Thomas J. Watson College of Engineering and Applied Sciences, Binghamton University</b>
 
 ## Homework
- * [HW 1 - Learning C for the millionth time but painfully slow edition](./hw1)
- * [HW 2 - Everything is a file](./hw2)
+ * [HW 1 - Learning C for the millionth time but painfully slow edition](./homeworks/hw1)
+ * [HW 2 - Everything is a file](./homeworks/hw2)
 
 ## Coding Assignments
  * [Project 1 - BYO Memory Allocator](./gmalloc)
