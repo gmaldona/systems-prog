@@ -1,4 +1,4 @@
-# Homework Assignment #1
+# Homework Assignment #2
 #
 # author: Gregory Maldonado
 # email : gmaldonado@cs.binghamton.edu
