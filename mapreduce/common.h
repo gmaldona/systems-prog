@@ -14,7 +14,7 @@
 #define _COMMON_H
 
 #define SUCCESS  0
-#define ERROR    -1
+#define ERROR    (-1)
 
 #define US_PER_SEC 1000000
 
