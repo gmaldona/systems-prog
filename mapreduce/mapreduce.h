@@ -11,6 +11,7 @@
  * Sciences, Binghamton University.
  */
 
+//==================================================================== 80 ====>>
 
 #ifndef _MAPREDUCE_H
 #define _MAPREDUCE_H
@@ -43,6 +44,6 @@ typedef struct _mapreduce_result
 
 void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result);
 
-
-
 #endif
+
+//==================================================================== 80 ====>>

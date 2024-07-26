@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <unistd.h>
 #include "mapreduce.h"
 #include "common.h"
 
@@ -53,8 +54,10 @@ size_t partition(char* src, size_t start, size_t size, size_t LIMIT, bool last) 
 
 void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
 {
-    DATA_SPLIT partitions[spec->split_num];
+    DATA_SPLIT*   partitions[spec->split_num];
     size_t partition_indices[spec->split_num]; // inclusive (0, partition_chunk)
+    pid_t     partition_pids[spec->split_num];
+
     int fd;
     if ((fd = open(spec->input_data_filepath, O_RDONLY)) < 0) {
         perror("Failed to open file");
@@ -74,17 +77,23 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
         return;
     }
 
-    size_t partition_sz = fd_stat.st_size / spec->split_num;
     size_t pos = 0;
     for (int i = 0; i < spec->split_num; ++i) {
         size_t index;
         if (i < spec->split_num - 1) {
-            index = partition(src, pos, partition_sz, fd_stat.st_size, false);
+            index = partition(src, pos,
+                              fd_stat.st_size / spec->split_num,
+                              fd_stat.st_size, false);
         } else {
-            index = partition(src, pos, partition_sz, fd_stat.st_size, true);
+            index = partition(src, pos,
+                              fd_stat.st_size / spec->split_num,
+                              fd_stat.st_size, true);
         }
 
         partition_indices[i] = index; // inclusive.
+        partitions[i] = mmap(NULL, sizeof(DATA_SPLIT),
+                             PROT_READ  | PROT_WRITE,
+                             MAP_SHARED | MAP_ANONYMOUS, -1, 0);
         pos = index + 1;
     }
 
@@ -107,11 +116,35 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
     
     gettimeofday(&start, NULL);
 
-    // add your code here ...
+    // https://stackoverflow.com/questions/876605/multiple-child-process
+    for (int i = 0; i < spec->split_num; ++i) {
+        if ((partition_pids[i] = fork()) < 0) {
+            perror("Failed to fork process");
+            return;
+        } else if (partition_pids[i] == 0) {
+            // worker
+            exit(0);
+        }
+    }
+
+    // wait for all children processes to finish
+    int status, waiting_on = spec->split_num;
+    pid_t child;
+    while (waiting_on > 0) {
+       child = wait(&status);
+       fprintf(stderr, "[DEBUG] child process %d finished\n", child);
+        --waiting_on;
+    }
 
     gettimeofday(&end, NULL);   
 
     result->processing_time = (end.tv_sec - start.tv_sec) * US_PER_SEC + (end.tv_usec - start.tv_usec);
+
+    for (int i = 0; i < spec->split_num; ++i) {
+        if (munmap(partitions[i], sizeof(DATA_SPLIT))) {
+            perror("Failed to unmap memory for DATA_SPLIT");
+        }
+    }
 }
 
 //==================================================================== 80 ====>>

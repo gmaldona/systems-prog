@@ -19,6 +19,8 @@
 #include "common.h"
 #include "usr_functions.h"
 
+//==================================================================== 80 ====>>
+
 /* User-defined map function for the "Letter counter" task.  
    This map function is called in a map worker process.
    @param split: The data split that the map function is going to work on.
@@ -64,8 +66,7 @@ int letter_counter_reduce(int * p_fd_in, int fd_in_num, int fd_out)
  */
 int word_finder_map(DATA_SPLIT * split, int fd_out)
 {
-    // add your implementation here ...
-
+    fprintf(stderr, "Not Implemented");
     return 0;
 }
 
@@ -84,9 +85,8 @@ int word_finder_map(DATA_SPLIT * split, int fd_out)
 */
 int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out)
 {
-    // add your implementation here ...
-
+    fprintf(stderr, "Not Implemented");
     return 0;
 }
 
-
+//==================================================================== 80 ====>>

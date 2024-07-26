@@ -1,4 +1,4 @@
-/*
+ /*
  * CS 551 Project "MapReduce".
  * The implemetation of the test driver program. Do NOT change this file.
  *
@@ -18,6 +18,8 @@
 
 #include "mapreduce.h"
 #include "usr_functions.h"
+
+ //==================================================================== 80 ====>>
 
 int str_is_decimal_num(char * str)
 {
@@ -159,3 +161,4 @@ int main(int argc, char * argv[])
     exit(0);
 }
 
+//==================================================================== 80 ====>>\\
