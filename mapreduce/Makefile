@@ -28,3 +28,9 @@ usr_functions.o: usr_functions.c usr_functions.h common.h
 	
 clean:
 	rm -rf *.o *.a $(TARGET)
+
+.PHONY: zip
+zip:
+	mkdir -p build
+	zip build/proj2_gmaldonado.zip usr_functions.c usr_functions.h \
+	mapreduce.c mapreduce.h common.h Makefile README.md *.txt
