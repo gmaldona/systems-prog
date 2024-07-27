@@ -152,7 +152,6 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
     pid_t child;
     while (waiting_on > 0) {
        child = wait(&status);
-       fprintf(stderr, "[DEBUG] child process %d finished\n", child);
         --waiting_on;
     }
     // had to reset before passing into reduce??
