@@ -57,6 +57,7 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
     DATA_SPLIT*   partitions[spec->split_num];
     size_t partition_indices[spec->split_num]; // inclusive (0, partition_chunk)
     pid_t     partition_pids[spec->split_num];
+    int       partition_fout[spec->split_num];
 
     int fd;
     if ((fd = open(spec->input_data_filepath, O_RDONLY)) < 0) {
@@ -79,6 +80,16 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
 
     size_t pos = 0;
     for (int i = 0; i < spec->split_num; ++i) {
+        partitions[i] = mmap(NULL, sizeof(DATA_SPLIT),
+                             PROT_READ  | PROT_WRITE,
+                             MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+
+        if ((partitions[i]->fd = open(spec->input_data_filepath, O_RDONLY)) < 0) {
+            printf("[fd %d] ", i);
+            perror("Failed to open fd");
+        }
+        lseek(partitions[i]->fd, pos, SEEK_SET);
+
         size_t index;
         if (i < spec->split_num - 1) {
             index = partition(src, pos,
@@ -91,9 +102,7 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
         }
 
         partition_indices[i] = index; // inclusive.
-        partitions[i] = mmap(NULL, sizeof(DATA_SPLIT),
-                             PROT_READ  | PROT_WRITE,
-                             MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+        partitions[i]->size = index;
         pos = index + 1;
     }
 
@@ -109,8 +118,7 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
 
     struct timeval start, end;
 
-    if (NULL == spec || NULL == result)
-    {
+    if (NULL == spec || NULL == result) {
         EXIT_ERROR(ERROR, "NULL pointer!\n");
     }
     
@@ -123,6 +131,11 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
             return;
         } else if (partition_pids[i] == 0) {
             // worker
+            char itm_file[32];
+            sprintf(itm_file, "partition-%d.itm", i);
+            partition_fout[i] = open(itm_file, O_WRONLY |
+                                              O_CREAT  | O_TRUNC, 0644);
+            spec->map_func(partitions[i], partition_fout[i]);
             exit(0);
         }
     }
@@ -138,7 +151,8 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
 
     gettimeofday(&end, NULL);   
 
-    result->processing_time = (end.tv_sec - start.tv_sec) * US_PER_SEC + (end.tv_usec - start.tv_usec);
+    result->processing_time = ( end.tv_sec -  start.tv_sec) * US_PER_SEC +
+                              (end.tv_usec - start.tv_usec);
 
     for (int i = 0; i < spec->split_num; ++i) {
         if (munmap(partitions[i], sizeof(DATA_SPLIT))) {

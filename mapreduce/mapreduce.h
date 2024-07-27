@@ -20,7 +20,7 @@
 typedef struct _data_split
 {
     int fd;  /* The file descriptor of the input data file */
-    int size; /* The size of the split */
+    size_t size; /* The size of the split */
     void * usr_data;  /* This field is used only by the "Word finder" program: it records the word to find in the input data file */
 }DATA_SPLIT;
 
