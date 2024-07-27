@@ -34,4 +34,4 @@ clean:
 zip:
 	mkdir -p build
 	zip build/proj2_gmaldonado.zip usr_functions.c usr_functions.h \
-	mapreduce.c mapreduce.h common.h Makefile README.md *.txt
+	mapreduce.c mapreduce.h common.h main.c Makefile README.md *.txt
