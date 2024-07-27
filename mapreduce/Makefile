@@ -27,7 +27,8 @@ usr_functions.o: usr_functions.c usr_functions.h common.h
 	$(CC) $(CFLAGS) -c $*.c
 	
 clean:
-	rm -rf *.o *.a $(TARGET)
+	$(RM) -rf *.o *.a $(TARGET)
+	$(RM) -r build
 
 .PHONY: zip
 zip:
