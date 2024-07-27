@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <string.h>
 #include <unistd.h>
 #include "mapreduce.h"
 #include "common.h"
@@ -121,6 +122,12 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
     }
     
     gettimeofday(&start, NULL);
+
+    for (int i = 0; i < spec->split_num; ++i) {
+        partitions[i]->usr_data = malloc(sizeof(char) * strlen(spec->usr_data) + 1);
+        memset(partitions[i]->usr_data, 0, strlen(spec->usr_data) + 1);
+        memcpy(partitions[i]->usr_data, spec->usr_data, strlen(spec->usr_data));
+    }
 
     // https://stackoverflow.com/questions/876605/multiple-child-process
     for (int i = 0; i < spec->split_num - 1; ++i) {

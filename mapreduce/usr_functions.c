@@ -131,6 +131,30 @@ int letter_counter_reduce(int * p_fd_in, int fd_in_num, int fd_out)
     return 0;
 }
 
+int add_to(char* payload, char** lines, size_t len, size_t* lines_sz, size_t* lines_malloced) {
+
+    if (*lines_sz == *lines_malloced) {
+        *lines_malloced *= 2;
+        char** new_lines = (char**)realloc(lines, sizeof(char*) * (*lines_malloced));
+        if (new_lines == NULL) {
+            perror("Unable to allocate memory");
+            return -1;
+        }
+        if (new_lines != lines) {
+            char** temp = lines;
+            lines = new_lines;
+            for (int i = 0; i < *lines_sz; ++i) {
+                *(lines + i) = *(temp + i);
+            }
+            free(temp);
+        }
+    }
+    *(lines + (*lines_sz)) = (char*) malloc(sizeof(char) * strlen(payload));
+    strncpy(*(lines + (*lines_sz)), payload, len);
+    (*lines_sz)++;
+    return strlen(payload);
+}
+
 // Bonus
 /* User-defined map function for the "Word finder" task.  
    This map function is called in a map worker process.
@@ -142,7 +166,43 @@ int letter_counter_reduce(int * p_fd_in, int fd_in_num, int fd_out)
  */
 int word_finder_map(DATA_SPLIT * split, int fd_out)
 {
-    fprintf(stderr, "Not Implemented");
+    char** lines = (char**) malloc(sizeof(char*) * 8);
+    size_t lines_malloced = 8;
+    size_t lines_sz = 0;
+
+    off_t start = lseek(split->fd, 0, SEEK_CUR);
+    char read_buff[split->size - start];
+
+    if ((read(split->fd, read_buff, split->size - start)) < 0) {
+        perror("Failed to read fd");
+        return -1;
+    }
+
+    size_t pos_s = 0;
+    for (off_t pos_e = 0; pos_e < split->size - start; ++pos_e) {
+        if (read_buff[pos_e] == '\n') {
+            char* buf = (char*)malloc((sizeof(char) * pos_e - pos_s) + 2);
+            strncpy(buf, read_buff + pos_s, pos_e - pos_s + 1);
+            char* needle = strnstr(buf, (char*)split->usr_data, strlen(buf));
+            if (needle != NULL) {
+                add_to(buf, lines, strlen(buf), &lines_sz, &lines_malloced);
+            }
+            free(buf);
+            pos_s = pos_e + 1;
+        }
+    }
+
+    for (int i = 0; i < lines_sz; ++i) {
+        if (write(fd_out, *(lines + i), strlen(*(lines + i))) < 0 ) {
+            perror("Failed to write to fd");
+            return -1;
+        }
+    }
+
+    for (int i = 0; i < lines_sz; ++i) {
+        free(*(lines + i));
+    }
+    free(lines);
     return 0;
 }
 
@@ -161,7 +221,63 @@ int word_finder_map(DATA_SPLIT * split, int fd_out)
 */
 int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out)
 {
-    fprintf(stderr, "Not Implemented");
+//    for (int i = 0; i < fd_in_num; ++i) {
+//
+//
+//                char  _char = read_buff[pos_s];
+//                char _freq[16];
+//                memset(_freq, 0, 16);
+//                memcpy(_freq, read_buff + pos_s + 2, pos_e - (pos_s + 2));
+//                char *end;
+//
+//                size_t freq = strtoll(_freq, &end, 10);
+//                if (*end == '\0') {
+//                    // find . -name "*.itm" -print0 | xargs -0 cat | grep a | cut -d':' -f2 | awk '{t=t+$1} END{print t}'
+//                    frequency[_char - 'a'] += freq;
+//                } else {
+//                    return -1;
+//                }
+//
+//
+
+    char** lines = (char**) malloc(sizeof(char*) * 8);
+    size_t lines_malloced = 8;
+    size_t lines_sz = 0;
+
+    for (int i = 0; i < fd_in_num; ++i) {
+        int fd = *(p_fd_in + i);
+
+        struct stat fd_stat;
+        if ((fstat(fd, &fd_stat)) < 0) {
+            fprintf(stderr, "[REDUCE fd@%d %d] ", i, fd);
+            perror("Failed to stat file");
+            return -1;
+        }
+
+        char read_buff[fd_stat.st_size];
+        if ((read(fd, read_buff, fd_stat.st_size)) < 0) {
+            perror("[REDUCE] Failed to read fd");
+            return -1;
+        }
+
+        size_t pos_s = 0;
+        for (size_t pos_e = 0; pos_e < fd_stat.st_size; ++pos_e) {
+            if (read_buff[pos_e] == '\n') {
+                char buf[pos_e - pos_s + 1];
+                strncpy(buf, read_buff + pos_s, pos_e - pos_s + 1);
+                add_to(buf, lines, pos_e - pos_s + 1, &lines_sz, &lines_malloced);
+                pos_s = pos_e + 1;
+            }
+        }
+
+    }
+    for (int i = 0; i < lines_sz; ++i) {
+        if (write(fd_out, *(lines + i), strlen(*(lines + i))) < 0 ) {
+            perror("Failed to write to fd");
+            return -1;
+        }
+    }
+
     return 0;
 }
 
