@@ -221,25 +221,6 @@ int word_finder_map(DATA_SPLIT * split, int fd_out)
 */
 int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out)
 {
-//    for (int i = 0; i < fd_in_num; ++i) {
-//
-//
-//                char  _char = read_buff[pos_s];
-//                char _freq[16];
-//                memset(_freq, 0, 16);
-//                memcpy(_freq, read_buff + pos_s + 2, pos_e - (pos_s + 2));
-//                char *end;
-//
-//                size_t freq = strtoll(_freq, &end, 10);
-//                if (*end == '\0') {
-//                    // find . -name "*.itm" -print0 | xargs -0 cat | grep a | cut -d':' -f2 | awk '{t=t+$1} END{print t}'
-//                    frequency[_char - 'a'] += freq;
-//                } else {
-//                    return -1;
-//                }
-//
-//
-
     char** lines = (char**) malloc(sizeof(char*) * 8);
     size_t lines_malloced = 8;
     size_t lines_sz = 0;
