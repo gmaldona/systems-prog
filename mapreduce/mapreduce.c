@@ -106,7 +106,7 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
         pos = index + 1;
     }
 
-    if (munmap(src, fd_stat.st_size) < 0) {
+   if (munmap(src, fd_stat.st_size) < 0) {
         perror("Failed to unmap memory");
         return;
     }
@@ -125,7 +125,7 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
     gettimeofday(&start, NULL);
 
     // https://stackoverflow.com/questions/876605/multiple-child-process
-    for (int i = 1; i < spec->split_num; ++i) {
+    for (int i = 0; i < spec->split_num - 1; ++i) {
         if ((partition_pids[i] = fork()) < 0) {
             perror("Failed to fork process");
             return;
@@ -143,11 +143,11 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
     }
     // for the main process
     char itm_file[32];
-    sprintf(itm_file, "partition-%d.itm", 0);
-    partition_fout[0] = open(itm_file, O_RDWR  |
+    sprintf(itm_file, "partition-%d.itm", spec->split_num - 1);
+    partition_fout[spec->split_num - 1] = open(itm_file, O_RDWR  |
                                       O_CREAT | O_TRUNC, 0644);
-    spec->map_func(partitions[0], partition_fout[0]);
-    *(result->map_worker_pid) = getpid();
+    spec->map_func(partitions[spec->split_num - 1], partition_fout[spec->split_num - 1]);
+    *(result->map_worker_pid + spec->split_num - 1) = getpid();
 
     // wait for all children processes to finish
     int status, waiting_on = spec->split_num - 1;

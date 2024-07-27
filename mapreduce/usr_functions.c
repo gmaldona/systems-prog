@@ -38,15 +38,16 @@
 int letter_counter_map(DATA_SPLIT * split, int fd_out)
 {
     size_t frequency[26];
-    char read_buff[split->size + 1];
+    off_t start = lseek(split->fd, 0, SEEK_CUR);
+    char read_buff[(split->size - start)];
 
     memset(frequency, 0, 26 * sizeof(size_t));
-    if ((read(split->fd, read_buff, split->size)) < 0) {
+    if ((read(split->fd, read_buff, split->size - start)) < 0) {
         perror("Failed to read fd");
         return -1;
     }
 
-    for (int i = 0; i < split->size; ++i) {
+    for (off_t i = 0; i < split->size - start; ++i) {
         if ('a' <= read_buff[i] && read_buff[i] <= 'z') {
             ++frequency[read_buff[i] - 'a'];
         } else if ('A' <= read_buff[i] && read_buff[i] <= 'Z') {
