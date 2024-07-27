@@ -9,6 +9,13 @@ BONUS:  Not Completed.
 DESCRIPTION: Implementation of MapReduce.
 
 No Memory Leaks via Valgrind
+```
+==383203== HEAP SUMMARY:
+==383203==     in use at exit: 0 bytes in 0 blocks
+==383203==   total heap usage: 1 allocs, 1 frees, 16 bytes allocated
+==383203== 
+==383203== All heap blocks were freed -- no leaks are possible
+```
 
 Test Cases:
 1. `./run-mapreduce "counter" input-warpeace.txt 4`
