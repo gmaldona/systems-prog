@@ -149,9 +149,8 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
 
     // wait for all children processes to finish
     int status, waiting_on = spec->split_num - 1;
-    pid_t child;
     while (waiting_on > 0) {
-       child = wait(&status);
+       wait(&status);
         --waiting_on;
     }
     // had to reset before passing into reduce??
