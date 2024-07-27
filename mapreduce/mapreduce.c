@@ -55,7 +55,6 @@ char DELIMITERS[] = {0x09, 0x0a, 0x32};
 void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
 {
     DATA_SPLIT*   partitions[spec->split_num];
-    size_t partition_indices[spec->split_num]; // inclusive (0, partition_chunk)
     pid_t     partition_pids[spec->split_num];
     int       partition_fout[spec->split_num];
 
@@ -101,7 +100,6 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
                               fd_stat.st_size, true);
         }
 
-        partition_indices[i] = index; // inclusive.
         partitions[i]->size = index;
         pos = index + 1;
     }
