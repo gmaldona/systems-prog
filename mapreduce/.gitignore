@@ -1,2 +1,5 @@
 # Too large -rw-rw-r--@ 1 gmaldonado staff 4.2M Mar 24 18:03 input-warpeace.txt
 input-warpeace.txt
+
+*.itm
+*.rst

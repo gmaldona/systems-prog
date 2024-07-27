@@ -34,13 +34,13 @@ char DELIMITERS[] = {0x09, 0x0a, 0x32};
  * @param size  The approximate partition size.
  * @return  The end index of the partition slice.
  */
-size_t partition(char* src, size_t start, size_t size, size_t LIMIT, bool last) {
+ size_t partition(char* src, size_t start, size_t size,  size_t LIMIT, bool last) {
 
     if (last || start + size >= LIMIT) {
         return LIMIT;
     }
 
-    size_t pos = start + size;
+     size_t pos = start + size;
 
     while (pos < LIMIT) {
         if (*(src + pos) == ' ') {
@@ -125,7 +125,7 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
     gettimeofday(&start, NULL);
 
     // https://stackoverflow.com/questions/876605/multiple-child-process
-    for (int i = 0; i < spec->split_num; ++i) {
+    for (int i = 1; i < spec->split_num; ++i) {
         if ((partition_pids[i] = fork()) < 0) {
             perror("Failed to fork process");
             return;
@@ -133,21 +133,41 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
             // worker
             char itm_file[32];
             sprintf(itm_file, "partition-%d.itm", i);
-            partition_fout[i] = open(itm_file, O_WRONLY |
-                                              O_CREAT  | O_TRUNC, 0644);
+            partition_fout[i] = open(itm_file, O_RDWR  |
+                                              O_CREAT | O_TRUNC, 0644);
             spec->map_func(partitions[i], partition_fout[i]);
             exit(0);
+        } else {
+            *(result->map_worker_pid + i) = partition_pids[i];
         }
     }
+    // for the main process
+    char itm_file[32];
+    sprintf(itm_file, "partition-%d.itm", 0);
+    partition_fout[0] = open(itm_file, O_RDWR  |
+                                      O_CREAT | O_TRUNC, 0644);
+    spec->map_func(partitions[0], partition_fout[0]);
+    *(result->map_worker_pid) = getpid();
 
     // wait for all children processes to finish
-    int status, waiting_on = spec->split_num;
+    int status, waiting_on = spec->split_num - 1;
     pid_t child;
     while (waiting_on > 0) {
        child = wait(&status);
        fprintf(stderr, "[DEBUG] child process %d finished\n", child);
         --waiting_on;
     }
+    // had to reset before passing into reduce??
+    for (int i = 0; i < spec->split_num; ++i) {
+        close(partition_pids[i]);
+        char itm[32];
+        sprintf(itm, "partition-%d.itm", i);
+        partition_fout[i] = open(itm, O_RDONLY, 0644);
+    }
+
+    int fd_rst = open(result->filepath, O_RDWR | O_CREAT | O_TRUNC, 0644);
+    result->reduce_worker_pid = getpid();
+    spec->reduce_func(partition_fout, spec->split_num, fd_rst);
 
     gettimeofday(&end, NULL);   
 

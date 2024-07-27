@@ -15,11 +15,13 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "common.h"
 #include "usr_functions.h"
 
 #define ALPHABET_SZ 26
+#define ITM_LINE_SZ 16
 
 //==================================================================== 80 ====>>
 
@@ -35,11 +37,10 @@
 
 int letter_counter_map(DATA_SPLIT * split, int fd_out)
 {
-    fprintf(stderr, "partition size %zu\n", split->size);
-    size_t counter[26];
+    size_t frequency[26];
     char read_buff[split->size + 1];
 
-    memset(counter, 0, 26 * sizeof(size_t));
+    memset(frequency, 0, 26 * sizeof(size_t));
     if ((read(split->fd, read_buff, split->size)) < 0) {
         perror("Failed to read fd");
         return -1;
@@ -47,30 +48,20 @@ int letter_counter_map(DATA_SPLIT * split, int fd_out)
 
     for (int i = 0; i < split->size; ++i) {
         if ('a' <= read_buff[i] && read_buff[i] <= 'z') {
-            ++counter[read_buff[i] - 'a'];
+            ++frequency[read_buff[i] - 'a'];
         } else if ('A' <= read_buff[i] && read_buff[i] <= 'Z') {
-            ++counter[(read_buff[i] + ' ') - 'a'];
+            ++frequency[(read_buff[i] + ' ') - 'a'];
         }
     }
 
     for (int i = 0; i < ALPHABET_SZ; ++i) {
-        printf("%c: %zu\n", i + 'a', counter[i]);
-    }
-
-    for (int i = 0; i < ALPHABET_SZ; ++i) {
-        char write_buff[16];
-        if (i < ALPHABET_SZ - 1) {
-            sprintf(write_buff, "%c: %zu, ", i + 'a', counter[i]);
-        } else {
-            sprintf(write_buff, "%c: %zu", i + 'a', counter[i]);
-        }
+        char write_buff[ITM_LINE_SZ];
+        sprintf(write_buff, "%c:%zu\n", i + 'a', frequency[i]);
         if (write(fd_out, write_buff, strlen(write_buff)) < 0 ) {
             perror("Failed to write to fd");
             return -1;
         }
     }
-
-    close(split->fd);
 
     return 0;
 }
@@ -89,7 +80,52 @@ int letter_counter_map(DATA_SPLIT * split, int fd_out)
 */
 int letter_counter_reduce(int * p_fd_in, int fd_in_num, int fd_out)
 {
-    // add your implementation here ...
+    size_t frequency[ALPHABET_SZ];
+    memset(frequency, 0, ALPHABET_SZ * sizeof(size_t));
+    for (int i = 0; i < fd_in_num; ++i) {
+        int fd = *(p_fd_in + i);
+
+        struct stat fd_stat;
+        if ((fstat(fd, &fd_stat)) < 0) {
+            fprintf(stderr, "[REDUCE fd@%d %d] ", i, fd);
+            perror("Failed to stat file");
+            return -1;
+        }
+
+        char read_buff[fd_stat.st_size];
+        if ((read(fd, read_buff, fd_stat.st_size)) < 0) {
+            perror("[REDUCE] Failed to read fd");
+            return -1;
+        }
+        size_t pos_s = 0;
+        for (size_t pos_e = 0; pos_e < fd_stat.st_size; ++pos_e) {
+            if (read_buff[pos_e] == '\n') {
+                char  _char = read_buff[pos_s];
+                char _freq[16];
+                memset(_freq, 0, 16);
+                memcpy(_freq, read_buff + pos_s + 2, pos_e - (pos_s + 2));
+                char *end;
+
+                size_t freq = strtoll(_freq, &end, 10);
+                if (*end == '\0') {
+                    // find . -name "*.itm" -print0 | xargs -0 cat | grep a | cut -d':' -f2 | awk '{t=t+$1} END{print t}'
+                    frequency[_char - 'a'] += freq;
+                } else {
+                    return -1;
+                }
+                pos_s = pos_e + 1;
+            }
+        }
+    }
+
+    for (int i = 0; i < ALPHABET_SZ; ++i) {
+        char write_buff[ITM_LINE_SZ];
+        sprintf(write_buff, "%c:%zu\n", i + 'a', frequency[i]);
+        if (write(fd_out, write_buff, strlen(write_buff)) < 0 ) {
+            perror("Failed to write to fd");
+            return -1;
+        }
+    }
 
     return 0;
 }
