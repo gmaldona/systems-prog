@@ -181,7 +181,6 @@ int word_finder_map(DATA_SPLIT * split, int fd_out)
     }
 
     size_t pos_s = 0;
-    regex_t reegex;
     for (off_t pos_e = 0; pos_e < split->size - start; ++pos_e) {
         if (read_buff[pos_e] == '\n') {
             char buf[pos_e - pos_s + 2];
