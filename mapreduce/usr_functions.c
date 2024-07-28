@@ -25,6 +25,27 @@
 
 //==================================================================== 80 ====>>
 
+char *
+_strnstr(const char *s, const char *find, size_t slen)
+{
+	char c, sc;
+	size_t len;
+
+	if ((c = *find++) != '\0') {
+		len = strlen(find);
+		do {
+			do {
+				if (slen-- < 1 || (sc = *s++) == '\0')
+					return (NULL);
+			} while (sc != c);
+			if (len > slen)
+				return (NULL);
+		} while (strncmp(s, find, len) != 0);
+		s--;
+	}
+	return ((char *)s);
+}
+
 /* User-defined map function for the "Letter counter" task.  
    This map function is called in a map worker process.
    @param split: The data split that the map function is going to work on.
@@ -182,11 +203,11 @@ int word_finder_map(DATA_SPLIT * split, int fd_out)
     size_t pos_s = 0;
     for (off_t pos_e = 0; pos_e < split->size - start; ++pos_e) {
         if (read_buff[pos_e] == '\n') {
-            char* buf = (char*)malloc((sizeof(char) * pos_e - pos_s) + 2);
+            char* buf = (char*)malloc((sizeof(char) * pos_e - pos_s) + 3);
             strncpy(buf, read_buff + pos_s, pos_e - pos_s + 1);
-            char* needle = strstr(buf, (char*)split->usr_data);
+            // char* needle = strstr(buf, (char*)split->usr_data);
             // MACOS specific function vvv 
-            // char* needle = strnstr(buf, (char*)split->usr_data, strlen(buf));
+            char* needle = _strnstr(buf, (char*)split->usr_data, strlen(buf));
             if (needle != NULL) {
                 add_to(buf, &lines, strlen(buf), &lines_sz, &lines_malloced);
             }
