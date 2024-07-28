@@ -33,7 +33,7 @@
  * @param size  The approximate partition size.
  * @return  The end index of the partition slice.
  */
- size_t partition(char* src, size_t start, size_t size,  size_t LIMIT, bool last) {
+ size_t partition(char* src, size_t start, size_t size,  size_t LIMIT, bool last, char DELIM) {
 
     if (last || start + size >= LIMIT) {
         return LIMIT;
@@ -42,7 +42,7 @@
      size_t pos = start + size;
 
     while (pos < LIMIT) {
-        if (*(src + pos) == ' ') {
+        if (*(src + pos) == DELIM) {
             return pos - 1;
         }
         ++pos;
@@ -89,14 +89,14 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
         lseek(partitions[i]->fd, pos, SEEK_SET);
 
         size_t index;
-        if (i < spec->split_num - 1) {
+        if (spec->usr_data == NULL) {
             index = partition(src, pos,
                               fd_stat.st_size / spec->split_num,
-                              fd_stat.st_size, false);
+                              fd_stat.st_size, false, ' ');
         } else {
             index = partition(src, pos,
                               fd_stat.st_size / spec->split_num,
-                              fd_stat.st_size, true);
+                              fd_stat.st_size, false, '\n');
         }
 
         partitions[i]->size = index;
