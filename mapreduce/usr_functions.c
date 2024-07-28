@@ -131,26 +131,27 @@ int letter_counter_reduce(int * p_fd_in, int fd_in_num, int fd_out)
     return 0;
 }
 
-int add_to(char* payload, char** lines, size_t len, size_t* lines_sz, size_t* lines_malloced) {
+int add_to(char* payload, char*** lines, size_t len, size_t* lines_sz, size_t* lines_malloced) {
+    char** _lines = *lines;
 
     if (*lines_sz == *lines_malloced) {
         *lines_malloced *= 2;
-        char** new_lines = (char**)realloc(lines, sizeof(char*) * (*lines_malloced));
+        char** new_lines = (char**)malloc(sizeof(char*) * (*lines_malloced));
         if (new_lines == NULL) {
             perror("Unable to allocate memory");
             return -1;
         }
-        if (new_lines != lines) {
-            char** temp = lines;
-            lines = new_lines;
-            for (int i = 0; i < *lines_sz; ++i) {
-                *(lines + i) = *(temp + i);
-            }
-            free(temp);
+
+        for (int i = 0; i < *lines_sz; ++i) {
+            *(new_lines + i) = *(_lines + i);
         }
+        free(_lines);
+        *lines = new_lines;
+        _lines = *lines;
     }
-    *(lines + (*lines_sz)) = (char*) malloc(sizeof(char) * strlen(payload));
-    strncpy(*(lines + (*lines_sz)), payload, len);
+
+    *(_lines + (*lines_sz)) = (char*) malloc(sizeof(char) * strlen(payload));
+    strncpy(*(_lines + (*lines_sz)), payload, len);
     (*lines_sz)++;
     return strlen(payload);
 }
@@ -185,7 +186,7 @@ int word_finder_map(DATA_SPLIT * split, int fd_out)
             strncpy(buf, read_buff + pos_s, pos_e - pos_s + 1);
             char* needle = strnstr(buf, (char*)split->usr_data, strlen(buf));
             if (needle != NULL) {
-                add_to(buf, lines, strlen(buf), &lines_sz, &lines_malloced);
+                add_to(buf, &lines, strlen(buf), &lines_sz, &lines_malloced);
             }
             free(buf);
             pos_s = pos_e + 1;
@@ -219,8 +220,7 @@ int word_finder_map(DATA_SPLIT * split, int fd_out)
              identified by p_fd_in[0], p_fd_in[1], and p_fd_in[2] respectively.
 
 */
-int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out)
-{
+int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out) {
     char** lines = (char**) malloc(sizeof(char*) * 8);
     size_t lines_malloced = 8;
     size_t lines_sz = 0;
@@ -246,7 +246,7 @@ int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out)
             if (read_buff[pos_e] == '\n') {
                 char buf[pos_e - pos_s + 1];
                 strncpy(buf, read_buff + pos_s, pos_e - pos_s + 1);
-                add_to(buf, lines, pos_e - pos_s + 1, &lines_sz, &lines_malloced);
+                add_to(buf, &lines, pos_e - pos_s + 1, &lines_sz, &lines_malloced);
                 pos_s = pos_e + 1;
             }
         }
@@ -258,6 +258,11 @@ int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out)
             return -1;
         }
     }
+
+    for (int i = 0; i < lines_sz; ++i) {
+        free(*(lines + i));
+    }
+    free(lines);
 
     return 0;
 }
