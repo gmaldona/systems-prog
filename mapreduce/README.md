@@ -5,7 +5,7 @@ B-Number:    B00784284
 Date:        2024-07-04
 
 STATUS: Completed.
-BONUS:  Not Completed.
+BONUS:  Completed.
 DESCRIPTION: Implementation of MapReduce.
 
 No Memory Leaks via Valgrind
@@ -48,7 +48,7 @@ y:45944
 z:2387
 ```
 
-2. 1. `./run-mapreduce "counter" inpuut-alice30.txt 4`
+2. `./run-mapreduce "counter" input-alice30.txt 4`
 ```
 a:8791
 b:1475
@@ -76,4 +76,12 @@ w:2675
 x:148
 y:2264
 z:78
+```
+
+3. `./run-mapreduce "finder" input-alice30.txt 4 "again, " && cat mr.rst | head -3`
+```
+heads down and saying "Come up again, dear!"  I shall only look
+again, and we won't talk about cats or dogs either, if you don't
+again, and the little golden key was lying on the glass table as
+one for catching mice--oh, I beg your pardon!' cried Alice again,
 ```
