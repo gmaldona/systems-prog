@@ -8,6 +8,33 @@ STATUS: Completed.
 BONUS:  Completed.
 DESCRIPTION: Implementation of MapReduce.
 
+Performance:
+
+1 process finding "CH4" in input-warpeace.txt
+```
+maldonadog@unova ~/sdv/gmaldonado.cs.binghamton.edu/cs551/2024-05-28/systems-prog/mapreduce
+ % ./run-mapreduce "finder" input-warpeace.txt 1 "CH4"
+***** RESULT ***** 
+Result file: mr.rst
+Map worker pids: 8793 
+Reduce worker pid: 8793
+Processing time (us): 16566
+```
+
+vs
+
+
+8 processes finding "CH4" in input-warpeace.txt
+```
+maldonadog@unova ~/sdv/gmaldonado.cs.binghamton.edu/cs551/2024-05-28/systems-prog/mapreduce
+ % ./run-mapreduce "finder" input-warpeace.txt 8 "CH4"
+***** RESULT ***** 
+Result file: mr.rst
+Map worker pids: 8837 8838 8839 8840 8841 8842 8843 8836 
+Reduce worker pid: 8836
+Processing time (us): 5483
+```
+
 No Memory Leaks via Valgrind
 ```
 ==383203== HEAP SUMMARY:
