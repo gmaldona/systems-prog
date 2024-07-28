@@ -25,8 +25,6 @@
 
 //==================================================================== 80 ====>>
 
-char DELIMITERS[] = {0x09, 0x0a, 0x32};
-
 /**
  * Finds the end index of a buffer partition.
  *

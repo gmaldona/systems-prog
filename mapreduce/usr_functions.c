@@ -184,19 +184,21 @@ int word_finder_map(DATA_SPLIT * split, int fd_out)
     regex_t reegex;
     for (off_t pos_e = 0; pos_e < split->size - start; ++pos_e) {
         if (read_buff[pos_e] == '\n') {
-            char* buf = (char*)malloc((sizeof(char) * pos_e - pos_s) + 3);
+            char buf[pos_e - pos_s + 2];
+            // char* buf = (char*)malloc((sizeof(char) * pos_e - pos_s) + 2);
+
             strncpy(buf, read_buff + pos_s, pos_e - pos_s + 1);
+            buf[pos_e - pos_s + 1] = '\0';
             // char* needle = strstr(buf, (char*)split->usr_data);
             // MACOS specific function vvv
-            // char* needle = strnstr(buf, (char*)split->usr_data, strlen(buf));
+            char* needle = strstr(buf, (char*)split->usr_data);
 
-            int res = regcomp( &reegex, split->usr_data, 0);
-            res = regexec( &reegex, buf, 0, NULL, 0);
+            // regcomp( &reegex, split->usr_data, 0);
+            // int res = regexec( &reegex, buf, 0, NULL, 0);
 
-            if (res == 0) {
+            if (needle != NULL) {
                 add_to(buf, &lines, strlen(buf), &lines_sz, &lines_malloced);
             }
-            free(buf);
             pos_s = pos_e + 1;
         }
     }
