@@ -7,6 +7,7 @@ Authored By: Gregory Maldonado
 ## Homework
  * [HW 1 - Learning C for the millionth time but painfully slow edition](./homeworks/hw1)
  * [HW 2 - Everything is a file](./homeworks/hw2)
+ * [HW 3 - Hollering and syscalling](./homeworks/hw3)
 
 ## Coding Assignments
  * [Project 1 - BYO Memory Allocator](./gmalloc)
