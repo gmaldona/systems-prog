@@ -254,8 +254,9 @@ int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out) {
         size_t pos_s = 0;
         for (size_t pos_e = 0; pos_e < fd_stat.st_size; ++pos_e) {
             if (read_buff[pos_e] == '\n') {
-                char buf[pos_e - pos_s + 1];
+                char buf[pos_e - pos_s + 2];
                 strncpy(buf, read_buff + pos_s, pos_e - pos_s + 1);
+                buf[pos_e - pos_s + 1] = '\0';
                 add_to(buf, &lines, pos_e - pos_s + 1, &lines_sz, &lines_malloced);
                 pos_s = pos_e + 1;
             }
