@@ -178,6 +178,7 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
                               (end.tv_usec - start.tv_usec);
 
     for (int i = 0; i < spec->split_num; ++i) {
+        free(partitions[i]->usr_data);
         if (munmap(partitions[i], sizeof(DATA_SPLIT))) {
             perror("Failed to unmap memory for DATA_SPLIT");
         }
