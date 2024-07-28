@@ -257,7 +257,7 @@ int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out) {
                 char buf[pos_e - pos_s + 2];
                 strncpy(buf, read_buff + pos_s, pos_e - pos_s + 1);
                 buf[pos_e - pos_s + 1] = '\0';
-                add_to(buf, &lines, pos_e - pos_s + 1, &lines_sz, &lines_malloced);
+                add_to(buf, &lines, pos_e - pos_s + 2, &lines_sz, &lines_malloced);
                 pos_s = pos_e + 1;
             }
         }
