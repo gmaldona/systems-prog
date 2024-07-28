@@ -10,11 +10,11 @@
 
 git_root=$(git worktree list | cut -d' ' -f1)
 
-if [ -d build ]; then
+mkdir -p build
 
-  valgrind --leak-check=full \
+valgrind --leak-check=full \
            --show-leak-kinds=all \
            --track-origins=yes \
            --verbose \
            --log-file=build/valgrind-out.txt \
-           "$git_root"/mapreduce/main
+           "$git_root"/mapreduce/run-mapreduce "counter" input-alice30.txt 4
