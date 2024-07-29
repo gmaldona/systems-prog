@@ -13,7 +13,7 @@ Authored By: Gregory Maldonado
  * [Project 1 - BYO Memory Allocator](./gmalloc)
  * [Project 2 - Pretend to be a Google Dev in 2004 - MapReduce](./mapreduce)
     * [MapReduce - Google Research](https://research.google/pubs/mapreduce-simplified-data-processing-on-large-clusters/)
- * [Project 3 - Pthread barrier Dupe](./pthread-barrier) 
+ * [Project 3 - Pthread Barrier Dupe](./pthread-barrier) 
 
 ---
 
