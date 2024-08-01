@@ -61,7 +61,7 @@ int mybarrier_wait(mybarrier_t * barrier)
 	
 	pthread_mutex_lock(&barrier->mutex);
 	barrier->count++;
-	pthread_cond_signal(&barrier->cond);
+    pthread_cond_broadcast(&barrier->cond);
 	pthread_mutex_unlock(&barrier->mutex);
 
 	while (barrier->count < barrier->barred_count) {
