@@ -12,36 +12,36 @@
  */
 
 #include <stdlib.h>
-#include <stdio.h> 
+#include <stdio.h>
 #include <string.h>
 
 #include "mybarrier.h"
 
 //==================================================================== 80 ====>>
 
-mybarrier_t * mybarrier_init(unsigned int count) {
-    mybarrier_t * barrier = malloc(sizeof(*barrier));
-    
-	if (NULL == barrier) {
-		perror("Failed to allocate memory");
+mybarrier_t *mybarrier_init(unsigned int count) {
+    mybarrier_t *barrier = malloc(sizeof(*barrier));
+
+    if (NULL == barrier) {
+        perror("Failed to allocate memory");
         return NULL;
     }
-	
-	barrier->count = count;
-	if (pthread_mutex_init(&barrier->mutex, NULL) != 0 ) {
-		perror("Failed to initialize barrier mutex");
-		return NULL;
-	}
 
-	if (pthread_cond_init(&barrier->cond, NULL) != 0) {
-		perror("Failed to initialize barrier conditional variable");
-		return NULL; 
-	}
+    barrier->count = count;
+    if (pthread_mutex_init(&barrier->mutex, NULL) != 0) {
+        perror("Failed to initialize barrier mutex");
+        return NULL;
+    }
+
+    if (pthread_cond_init(&barrier->cond, NULL) != 0) {
+        perror("Failed to initialize barrier conditional variable");
+        return NULL;
+    }
 
     return barrier;
 }
 
-int mybarrier_destroy(mybarrier_t * barrier) {
+int mybarrier_destroy(mybarrier_t *barrier) {
 
     if (barrier == NULL) {
         return -1;
@@ -52,15 +52,14 @@ int mybarrier_destroy(mybarrier_t * barrier) {
     }
 
     pthread_mutex_unlock(&barrier->mutex);
-	pthread_mutex_destroy(&barrier->mutex);
-	pthread_cond_destroy(&barrier->cond);
+    pthread_mutex_destroy(&barrier->mutex);
+    pthread_cond_destroy(&barrier->cond);
 
     free(barrier);
-
-	return 0;
+    return 0;
 }
 
-int mybarrier_wait(mybarrier_t * barrier) {
+int mybarrier_wait(mybarrier_t *barrier) {
 
     if (barrier == NULL) {
         return -1;
@@ -71,7 +70,7 @@ int mybarrier_wait(mybarrier_t * barrier) {
         return -1;
     }
 
-	pthread_mutex_lock(&barrier->mutex);
+    pthread_mutex_lock(&barrier->mutex);
     // any thread after count will return 0 and not block.
     if (barrier->count == 0) {
         pthread_mutex_lock(&barrier->mutex);
@@ -82,11 +81,11 @@ int mybarrier_wait(mybarrier_t * barrier) {
         pthread_mutex_unlock(&barrier->mutex);
     }
 
-	while (barrier->count > 0) {
-		pthread_cond_wait(&barrier->cond, &barrier->mutex);
-	}
+    while (barrier->count > 0) {
+        pthread_cond_wait(&barrier->cond, &barrier->mutex);
+    }
     pthread_mutex_unlock(&barrier->mutex);
-	return 0;
+    return 0;
 }
 
 //==================================================================== 80 ====>>

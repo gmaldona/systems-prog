@@ -20,14 +20,14 @@
 //==================================================================== 80 ====>>
 
 typedef struct _mybarrier_t {
-    unsigned int count;
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-}mybarrier_t;
+  unsigned int count;
+  pthread_mutex_t mutex;
+  pthread_cond_t cond;
+} mybarrier_t;
 
-mybarrier_t * mybarrier_init(unsigned int count);
-int mybarrier_destroy(mybarrier_t * barrier);
-int mybarrier_wait(mybarrier_t * barrier);
+mybarrier_t *mybarrier_init(unsigned int count);
+int mybarrier_destroy(mybarrier_t *barrier);
+int mybarrier_wait(mybarrier_t *barrier);
 
 #endif //#ifndef _MYBARRIER_H
 
