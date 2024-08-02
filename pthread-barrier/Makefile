@@ -24,3 +24,8 @@ mybarrier.o: mybarrier.c mybarrier.h
 
 clean:
 	rm -rf *.o *.a $(TARGET)
+
+.PHONY: zip
+zip: mybarrier.c mybarrier.h main.c
+	mkdir -p build
+	zip build/proj3_gmaldonado.zip mybarrier.c mybarrier.h main.c Makefile
