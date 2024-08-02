@@ -21,8 +21,6 @@ main: main.c
 	
 mybarrier.o: mybarrier.c mybarrier.h
 	$(CC) $(CFLAGS) -c $*.c
-	
 
 clean:
 	rm -rf *.o *.a $(TARGET)
-

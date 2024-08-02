@@ -13,16 +13,13 @@
 
 #include <stdlib.h>
 #include <stdio.h> 
-#include <stdlib.h> 
 #include <string.h>
-#include <pthread.h>
 
 #include "mybarrier.h"
 
 //==================================================================== 80 ====>>
 
-mybarrier_t * mybarrier_init(unsigned int count)
-{
+mybarrier_t * mybarrier_init(unsigned int count) {
     mybarrier_t * barrier = malloc(sizeof(*barrier));
     
 	if (NULL == barrier) {
@@ -30,8 +27,7 @@ mybarrier_t * mybarrier_init(unsigned int count)
         return NULL;
     }
 	
-	barrier->barred_count = count;
-	barrier->count = 0;
+	barrier->count = count;
 	if (pthread_mutex_init(&barrier->mutex, NULL) != 0 ) {
 		perror("Failed to initialize barrier mutex");
 		return NULL;
@@ -45,30 +41,52 @@ mybarrier_t * mybarrier_init(unsigned int count)
     return barrier;
 }
 
-int mybarrier_destroy(mybarrier_t * barrier)
-{
-	int ret = 0;
-	
+int mybarrier_destroy(mybarrier_t * barrier) {
+
+    if (barrier == NULL) {
+        return -1;
+    }
+
+    while (barrier->count > 0) {
+        pthread_cond_wait(&barrier->cond, &barrier->mutex);
+    }
+
+    pthread_mutex_unlock(&barrier->mutex);
 	pthread_mutex_destroy(&barrier->mutex);
 	pthread_cond_destroy(&barrier->cond);
-	
-	return ret;
+
+    free(barrier);
+
+	return 0;
 }
 
-int mybarrier_wait(mybarrier_t * barrier)
-{
-	int ret = 0;
-	
-	pthread_mutex_lock(&barrier->mutex);
-	barrier->count++;
-    pthread_cond_broadcast(&barrier->cond);
-	pthread_mutex_unlock(&barrier->mutex);
+int mybarrier_wait(mybarrier_t * barrier) {
 
-	while (barrier->count < barrier->barred_count) {
+    if (barrier == NULL) {
+        return -1;
+    }
+
+    // chance that destroy() deletes both and NULL pointer exception??
+    if (&(barrier->mutex) == NULL || &(barrier->cond) == NULL) {
+        return -1;
+    }
+
+	pthread_mutex_lock(&barrier->mutex);
+    // any thread after count will return 0 and not block.
+    if (barrier->count == 0) {
+        pthread_mutex_lock(&barrier->mutex);
+        return -1;
+    } else {
+        barrier->count--;
+        pthread_cond_broadcast(&barrier->cond);
+        pthread_mutex_unlock(&barrier->mutex);
+    }
+
+	while (barrier->count > 0) {
 		pthread_cond_wait(&barrier->cond, &barrier->mutex);
 	}
-	
-	return ret;
+    pthread_mutex_unlock(&barrier->mutex);
+	return 0;
 }
 
 //==================================================================== 80 ====>>
