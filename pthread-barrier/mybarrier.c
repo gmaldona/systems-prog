@@ -30,11 +30,13 @@ mybarrier_t *mybarrier_init(unsigned int count) {
     barrier->count = count;
     if (pthread_mutex_init(&barrier->mutex, NULL) != 0) {
         perror("Failed to initialize barrier mutex");
+        free(barrier);
         return NULL;
     }
 
     if (pthread_cond_init(&barrier->cond, NULL) != 0) {
         perror("Failed to initialize barrier conditional variable");
+        free(barrier);
         return NULL;
     }
 
