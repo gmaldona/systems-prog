@@ -24,6 +24,7 @@ mybarrier.o: mybarrier.c mybarrier.h
 
 clean:
 	rm -rf *.o *.a $(TARGET)
+	$(RM) -rf build
 
 .PHONY: zip
 zip: mybarrier.c mybarrier.h main.c
