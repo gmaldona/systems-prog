@@ -17,4 +17,4 @@ valgrind --leak-check=full \
            --track-origins=yes \
            --verbose \
            --log-file=build/valgrind-out.txt \
-           "$git_root"/mapreduce/run-mapreduce "finder" input-warpeace.txt 4 "ourselves"
+           "$git_root"/pthread-barrier/build/main
