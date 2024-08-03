@@ -76,11 +76,13 @@ int test_max() { // will barrier up to 3 and the 4th will fail the barrier.
 int test_destroy() { // will wait forever.
     barrier = mybarrier_init(3);
     mybarrier_destroy(barrier);
+    return 0;
 }
 
 int test_destroy2() { // will exit immediately.
     barrier = mybarrier_init(0);
     mybarrier_destroy(barrier);
+    return 0;
 }
 
 int main(void) {
