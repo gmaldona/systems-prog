@@ -22,18 +22,22 @@ mybarrier_t *barrier;
 volatile unsigned int count;
 
 void *thread(void *arg) {
-    printf("SPAWN\n");
+    fprintf(stderr, "[FINE] Thread spawned\n");
     sleep(count++);
-    mybarrier_wait(barrier);
-    printf("WAKE\n");
+    int ret = mybarrier_wait(barrier);
+    if (ret == 0) {
+        fprintf(stderr, "[FINE] Thread awake\n");
+    } else {
+        fprintf(stderr, "[WARNING] Failed to barrier thread (MAX == 3)\n");
+    }
+
     return NULL;
 }
 
-int main(void) {
-
-    pthread_t threads[3];
+int test_not_enough() { // will wait forever.
+    pthread_t threads[2];
     barrier = mybarrier_init(3);
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 2; ++i) {
         if (pthread_create(&threads[i], NULL, thread, NULL) != 0) {
             perror("Failed to created pthread");
             return 1;
@@ -41,7 +45,43 @@ int main(void) {
     }
 
     mybarrier_destroy(barrier);
-    sleep(3);
+    fprintf(stderr, "[FINE] Barrier destroyed\n");
+    sleep(2);
+    return 0;
+}
+
+int test_max() { // will barrier up to 3 and the 4th will fail the barrier.
+    pthread_t threads[4];
+    barrier = mybarrier_init(3);
+    for (int i = 0; i < 4; ++i) {
+        if (pthread_create(&threads[i], NULL, thread, NULL) != 0) {
+            perror("Failed to created pthread");
+            return 1;
+        }
+    }
+
+    mybarrier_destroy(barrier);
+    fprintf(stderr, "[FINE] Barrier destroyed\n");
+    sleep(5);
+    return 0;
+}
+
+int test_destroy() { // will wait forever.
+    barrier = mybarrier_init(3);
+    mybarrier_destroy(barrier);
+}
+
+int test_destroy2() { // will exit immediately.
+    barrier = mybarrier_init(0);
+    mybarrier_destroy(barrier);
+}
+
+int main(void) {
+
+    test_max();
+    // test_not_enough();
+    // test_destroy();
+    // test_destroy2();
 
     return 0;
 }
