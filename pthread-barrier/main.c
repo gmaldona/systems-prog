@@ -34,6 +34,13 @@ void *thread(void *arg) {
     return NULL;
 }
 
+int check_memleak() {
+    barrier = mybarrier_init(1);
+    mybarrier_wait(barrier);
+    mybarrier_destroy(barrier);
+    return 0;
+}
+
 int test_not_enough() { // will wait forever.
     pthread_t threads[2];
     barrier = mybarrier_init(3);
@@ -78,10 +85,11 @@ int test_destroy2() { // will exit immediately.
 
 int main(void) {
 
-    test_max();
+    // test_max();
     // test_not_enough();
     // test_destroy();
     // test_destroy2();
+    check_memleak();
 
     return 0;
 }
