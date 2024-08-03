@@ -87,11 +87,11 @@ int test_destroy2() { // will exit immediately.
 
 int main(void) {
 
-    // test_max();
+    test_max();
     // test_not_enough();
     // test_destroy();
     // test_destroy2();
-    check_memleak();
+    // check_memleak();
 
     return 0;
 }
