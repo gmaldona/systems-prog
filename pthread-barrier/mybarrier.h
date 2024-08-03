@@ -20,7 +20,7 @@
 //==================================================================== 80 ====>>
 
 typedef struct _mybarrier_t {
-  unsigned int count;
+  int count;
   pthread_mutex_t mutex;
   pthread_cond_t cond;
 } mybarrier_t;

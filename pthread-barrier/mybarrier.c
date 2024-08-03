@@ -74,13 +74,13 @@ int mybarrier_wait(mybarrier_t *barrier) {
 
     pthread_mutex_lock(&barrier->mutex);
     // any thread after count will return 0 and not block.
-    if (barrier->count == 0) {
-        pthread_mutex_lock(&barrier->mutex);
-        return -1;
-    } else {
-        barrier->count--;
+    barrier->count--;
+    if (barrier->count > -1) {
         pthread_cond_broadcast(&barrier->cond);
         pthread_mutex_unlock(&barrier->mutex);
+    } else {
+        pthread_mutex_unlock(&barrier->mutex);
+        return -1;
     }
 
     while (barrier->count > 0) {
