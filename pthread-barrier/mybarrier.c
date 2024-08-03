@@ -67,11 +67,6 @@ int mybarrier_wait(mybarrier_t *barrier) {
         return -1;
     }
 
-    // chance that destroy() deletes both and NULL pointer exception??
-    if (&(barrier->mutex) == NULL || &(barrier->cond) == NULL) {
-        return -1;
-    }
-
     pthread_mutex_lock(&barrier->mutex);
     // any thread after count will return 0 and not block.
     barrier->count--;
